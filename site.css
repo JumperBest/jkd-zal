@@ -1,0 +1,69 @@
+/* Спільний стиль «Віртуального залу»: головна (index.html) і уроки (lessons.html).
+   Атмосфера: темна вода + жовтий акцент (колір костюма 3D-тренера). trainer3d.html має свій стиль. */
+:root {
+  --ink:#07090d; --bg:#0b0e13; --bg2:#10141b; --panel:#141921; --panel2:#1a2029; --line:#232b36; --line2:#2f3946;
+  --text:#eef1f5; --muted:#9aa5b3; --dim:#6b7684;
+  --acc:#ffc83d; --acc2:#ffdd7a; --acc-ink:#1a1400; --acc-soft:rgba(255,200,61,.12);
+  --water:#3fa2ff; --water2:#7fd4ff; --water-soft:rgba(63,162,255,.12);
+  --ok:#43d39a; --ok-soft:rgba(67,211,154,.12); --bad:#ff6a5c; --bad-soft:rgba(255,106,92,.10);
+  --stage:#14161a; /* фон 3D-сцени — щоб рамка зливалась */
+  --r:18px; --r-sm:12px;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Manrope", "Segoe UI", system-ui, sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 var(--body); -webkit-font-smoothing:antialiased; }
+body::before { /* легке зерно поверх усього — «плівка» */
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:100; opacity:.05; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+a { color:inherit; }
+::selection { background:var(--acc); color:var(--acc-ink); }
+h1, h2, h3 { font-family:var(--display); font-weight:700; letter-spacing:-.02em; line-height:1.08; margin:0; }
+
+/* --- логотип: жовтий квадрат з чорною смугою (як костюм) --- */
+.logo { display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-family:var(--display); font-weight:700; font-size:15px; letter-spacing:-.01em; white-space:nowrap; }
+.logo i { width:26px; height:26px; border-radius:7px; flex:none; background:linear-gradient(100deg, var(--acc) 0 62%, #111 62% 74%, var(--acc) 74%); box-shadow:0 0 0 1px rgba(255,200,61,.4), 0 6px 18px rgba(255,200,61,.25); }
+.logo span { color:var(--muted); font-weight:500; }
+
+/* --- кнопки --- */
+.btn { --b:var(--line2); display:inline-flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; cursor:pointer;
+  background:rgba(255,255,255,.03); color:var(--text); border:1px solid var(--b); border-radius:999px;
+  padding:12px 22px; font:600 15px/1.2 var(--body); transition:transform .25s var(--ease), border-color .2s, background .2s, box-shadow .25s; }
+.btn:hover:not(:disabled) { border-color:var(--acc); background:var(--acc-soft); }
+.btn:active:not(:disabled) { transform:scale(.97); }
+.btn:disabled { opacity:.4; cursor:default; }
+.btn.pri { background:var(--acc); color:var(--acc-ink); border-color:var(--acc); box-shadow:0 10px 30px -8px rgba(255,200,61,.55); }
+.btn.pri:hover:not(:disabled) { background:var(--acc2); transform:translateY(-2px); box-shadow:0 16px 36px -10px rgba(255,200,61,.7); }
+.btn.sm { padding:8px 14px; font-size:13px; }
+.btn .arr { transition:transform .25s var(--ease); }
+.btn:hover .arr { transform:translateX(4px); }
+
+/* перемикач з кількох кнопок (ціль, швидкість, правша/лівша) */
+.seg { display:inline-flex; padding:3px; gap:2px; background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:999px; }
+.seg button { background:transparent; border:0; color:var(--muted); font:600 13px/1 var(--body); padding:8px 13px; border-radius:999px; cursor:pointer; white-space:nowrap; transition:background .2s, color .2s; }
+.seg button:hover:not(:disabled) { color:var(--text); }
+.seg button.on { background:var(--acc); color:var(--acc-ink); }
+.seg button:disabled { opacity:.35; cursor:default; }
+
+.chip { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--muted); background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:999px; padding:4px 11px; white-space:nowrap; }
+.chip.book::before { content:""; width:10px; height:12px; border-radius:2px; background:linear-gradient(90deg, var(--acc) 0 30%, var(--acc2) 30%); opacity:.85; }
+.eyebrow { font:700 12px/1 var(--body); letter-spacing:.18em; text-transform:uppercase; color:var(--acc); }
+
+/* --- поява при прокрутці --- */
+.rv { opacity:0; transform:translateY(26px); transition:opacity .8s var(--ease), transform .8s var(--ease); transition-delay:var(--d, 0s); }
+.rv.in { opacity:1; transform:none; }
+
+/* --- сповіщення --- */
+#toast { position:fixed; left:50%; bottom:24px; z-index:90; transform:translate(-50%, 30px); opacity:0; pointer-events:none;
+  background:var(--panel2); border:1px solid var(--line2); border-left:3px solid var(--acc); color:var(--text);
+  padding:12px 18px; border-radius:12px; font-size:14px; max-width:min(92vw, 460px); box-shadow:0 20px 50px rgba(0,0,0,.5); transition:all .35s var(--ease); }
+#toast.show { opacity:1; transform:translate(-50%, 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  .rv { opacity:1; transform:none; }
+  html { scroll-behavior:auto; }
+}

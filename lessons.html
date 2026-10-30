@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JKD Віртуальний зал — уроки</title>
+<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html) + кроки + типові помилки. Дивишся і тренуєшся.
+     Поки тільки удари руками (ноги в 3D ще неточні). Перевірка свого відео — в розробці.
+     Урок вміщається на один екран; під 3D — своя панель: пуск/пауза, повзунок часу, швидкість. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="site.css">
+<style>
+  body { font-size:14px; }
+  [hidden] { display:none !important; }
+  @keyframes up { from { opacity:0; transform:translateY(12px); } }
+  .anim > * { animation:up .5s var(--ease) both; animation-delay:calc(var(--i, 0) * 45ms); }
+
+  /* --- шапка --- */
+  .top { position:sticky; top:0; z-index:40; height:56px; display:flex; align-items:center; gap:14px; padding:0 16px;
+    background:rgba(11,14,19,.88); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid var(--line); }
+  .top .sp { flex:1; }
+  .iconbtn { display:none; width:38px; height:38px; border-radius:11px; border:1px solid var(--line); background:transparent; color:var(--text); cursor:pointer; font-size:17px; }
+  .belt { display:flex; align-items:center; gap:10px; font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+  .belt .track { width:120px; height:6px; border-radius:3px; background:var(--line); overflow:hidden; position:relative; }
+  .belt .track i { position:absolute; inset:0 auto 0 0; width:0; border-radius:3px; background:linear-gradient(90deg, var(--acc), var(--acc2)); transition:width .9s var(--ease); }
+  .belt b { color:var(--text); font-family:var(--display); letter-spacing:0; font-size:12px; white-space:nowrap; }
+
+  /* --- каркас: усе на один екран --- */
+  .app { display:grid; grid-template-columns:250px minmax(0, 1fr); height:calc(100vh - 56px); height:calc(100dvh - 56px); }
+  main { min-width:0; min-height:0; overflow:auto; }
+
+  /* --- програма уроків --- */
+  #side { overflow:auto; padding:14px 10px 20px; border-right:1px solid var(--line); background:var(--bg2); }
+  #side .homelink { display:flex; align-items:center; gap:8px; width:100%; padding:8px 10px; border-radius:10px; border:1px solid var(--line); background:transparent; color:var(--text);
+    font:700 13px/1.2 var(--body); cursor:pointer; margin-bottom:6px; transition:border-color .2s, background .2s; }
+  #side .homelink:hover, #side .homelink.on { border-color:var(--acc); background:var(--acc-soft); }
+  #side h4 { margin:16px 10px 6px; font:700 10.5px/1 var(--body); letter-spacing:.16em; text-transform:uppercase; color:var(--dim); display:flex; gap:8px; }
+  #side h4 span { color:var(--acc); }
+  .li { display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:7px 10px; border-radius:10px; border:1px solid transparent; background:transparent; color:var(--text);
+    font:600 13px/1.25 var(--body); cursor:pointer; transition:background .2s, border-color .2s; position:relative; }
+  .li:hover { background:rgba(255,255,255,.03); }
+  .li.on { background:var(--panel2); border-color:var(--line2); }
+  .li.on::before { content:""; position:absolute; left:-10px; top:8px; bottom:8px; width:3px; border-radius:0 3px 3px 0; background:var(--acc); }
+  .li.locked { color:var(--dim); cursor:default; }
+  .li small { display:block; color:var(--dim); font-size:11px; font-weight:500; }
+  .st { width:20px; height:20px; flex:none; border-radius:50%; display:grid; place-items:center; font-size:9px; font-weight:800; }
+  .st.open { border:2px solid var(--acc); color:var(--acc); }
+  .st.done { background:var(--ok); color:#06261a; font-size:11px; }
+  .st.lock { border:1px dashed var(--line2); }
+  .soonbox { margin:16px 4px 0; padding:12px; border-radius:12px; border:1px dashed var(--line2); color:var(--muted); font-size:12px; line-height:1.45; }
+  .soonbox b { color:var(--text); display:block; margin-bottom:2px; }
+  .scrim { display:none; }
+
+  /* --- огляд залу --- */
+  #home { padding:20px clamp(16px, 2.4vw, 28px) 40px; }
+  .welcome { position:relative; border-radius:22px; overflow:hidden; padding:clamp(22px, 3.4vw, 40px); border:1px solid var(--line); isolation:isolate; min-height:260px;
+    display:flex; flex-direction:column; justify-content:center;
+    background:linear-gradient(90deg, var(--bg2) 0%, rgba(16,20,27,.88) 38%, rgba(16,20,27,.15) 72%, transparent), url(img/welcome.jpg) 75% 40% / cover no-repeat, var(--bg2); }
+  .welcome > * { max-width:520px; }
+  .welcome h1 { font-size:clamp(28px, 3.6vw, 48px); font-weight:900; text-transform:uppercase; letter-spacing:-.045em; margin:10px 0 8px; }
+  .welcome h1 em { font-style:normal; color:var(--water2); }
+  .welcome p { color:var(--muted); font-size:15px; margin:0 0 18px; }
+  .modh { display:flex; align-items:baseline; gap:10px; margin:24px 0 10px; }
+  .modh h2 { font-size:18px; }
+  .modh span { font:700 12px/1 var(--display); color:var(--acc); }
+  .cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:10px; }
+  .lc { text-align:left; display:flex; flex-direction:column; gap:6px; padding:14px; border-radius:16px; border:1px solid var(--line); background:var(--panel);
+    color:var(--text); font:inherit; cursor:pointer; transition:transform .3s var(--ease), border-color .25s, box-shadow .3s; position:relative; }
+  .lc:hover:not(.locked) { transform:translateY(-4px); border-color:var(--acc); box-shadow:0 20px 40px -24px rgba(255,200,61,.35); }
+  .lc h3 { font:700 14.5px/1.3 var(--display); letter-spacing:-.01em; padding-right:30px; }
+  .lc p { margin:0; color:var(--dim); font-size:12.5px; }
+  .lc.locked { opacity:.45; cursor:default; background:transparent; }
+  .lc.done { border-color:rgba(67,211,154,.4); }
+  .lc .st { position:absolute; right:12px; top:12px; }
+
+  /* --- урок: ліва колонка (текст) + права (3D) --- */
+  #lesson { display:grid; grid-template-columns:minmax(300px, 380px) minmax(0, 1fr); height:100%; min-height:0; }
+  .doc { min-height:0; overflow:auto; padding:18px 18px 20px; border-right:1px solid var(--line); display:flex; flex-direction:column; gap:14px; }
+  .doc h1 { font-size:clamp(20px, 1.8vw, 26px); font-weight:700; letter-spacing:-.03em; margin:6px 0 4px; }
+  .goal { color:var(--muted); margin:0; font-size:13.5px; line-height:1.5; }
+  .blk h2 { font:700 11px/1 var(--body); letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:0 0 8px; display:flex; align-items:center; gap:8px; }
+  .steps { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; }
+  .step { display:grid; grid-template-columns:24px 1fr; gap:10px; width:100%; text-align:left; padding:8px 10px; border-radius:11px; border:1px solid transparent; background:transparent;
+    color:var(--muted); font:inherit; font-size:13px; line-height:1.4; cursor:pointer; transition:border-color .2s, background .2s, color .2s; }
+  .step:hover { background:rgba(255,255,255,.03); color:var(--text); }
+  .step .k { width:24px; height:24px; border-radius:8px; display:grid; place-items:center; font:700 11px/1 var(--display); background:rgba(255,255,255,.05); color:var(--muted); transition:all .25s; }
+  .step b { color:var(--text); }
+  .step.on { border-color:rgba(255,200,61,.45); background:var(--acc-soft); color:var(--text); }
+  .step.on .k { background:var(--acc); color:var(--acc-ink); }
+  .mist { border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden; }
+  .mist + .mist { margin-top:6px; }
+  .mist summary { list-style:none; cursor:pointer; padding:9px 12px; display:flex; gap:9px; align-items:center; font-weight:700; font-size:13px; }
+  .mist summary::-webkit-details-marker { display:none; }
+  .mist summary::before { content:"!"; width:20px; height:20px; flex:none; border-radius:6px; display:grid; place-items:center; background:var(--bad-soft); color:var(--bad); font-weight:800; font-size:12px; }
+  .mist summary::after { content:"▾"; margin-left:auto; color:var(--dim); transition:transform .25s; }
+  .mist[open] summary::after { transform:rotate(180deg); }
+  .mist .body { padding:0 12px 12px; display:grid; gap:7px; font-size:13px; line-height:1.45; animation:up .35s var(--ease); }
+  .mist dt { font:700 10px/1.4 var(--body); letter-spacing:.12em; text-transform:uppercase; color:var(--dim); }
+  .mist dd { margin:0; }
+  .mist dd.todo { color:var(--text); font-weight:600; }
+  .mist dt.todo { color:var(--acc); }
+  .vidsoon { display:flex; gap:12px; align-items:center; padding:10px 12px; border-radius:12px; border:1px dashed var(--line2); color:var(--muted); font-size:12.5px; line-height:1.4; }
+  .vidsoon .ic { width:32px; height:32px; flex:none; border-radius:10px; display:grid; place-items:center; background:var(--water-soft); color:var(--water2); }
+  .vidsoon .ic svg { width:18px; }
+  .vidsoon b { color:var(--text); }
+  .finish { margin-top:auto; display:flex; gap:8px; flex-wrap:wrap; padding-top:4px; }
+  .finish .btn { flex:1 1 auto; }
+
+  /* сцена */
+  .stagecol { min-width:0; min-height:0; display:flex; flex-direction:column; background:var(--stage); }
+  .tools { display:flex; gap:6px; align-items:center; flex-wrap:wrap; padding:8px 10px; border-bottom:1px solid var(--line); }
+  .tools .sp { flex:1; }
+  .tools .seg button, .transport .seg button { padding:6px 10px; font-size:12px; }
+  .tbtn { height:30px; min-width:30px; padding:0 10px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--muted); font:600 12px/1 var(--body); cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all .2s; }
+  .tbtn:hover:not(:disabled) { color:var(--text); border-color:var(--line2); }
+  .tbtn.on { color:var(--acc); border-color:rgba(255,200,61,.5); background:var(--acc-soft); }
+  .tbtn:disabled { opacity:.35; cursor:default; }
+  #view { flex:1; position:relative; min-height:0; }
+  #view iframe { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
+  .nostage { position:absolute; inset:0; display:grid; place-items:center; text-align:center; padding:30px; color:var(--muted); }
+  .nostage b { display:block; font:700 20px/1.3 var(--display); color:var(--text); margin-bottom:6px; }
+  #cap { position:absolute; left:12px; right:12px; bottom:12px; pointer-events:none; display:flex; justify-content:center; }
+  #cap span { background:rgba(11,14,19,.86); backdrop-filter:blur(8px); border:1px solid var(--line); border-radius:12px; padding:8px 14px; font-size:13.5px; max-width:640px; text-align:center; }
+  #cap span:empty { display:none; }
+  #cap b { color:var(--acc); }
+  .transport { display:flex; align-items:center; gap:10px; padding:10px 12px; border-top:1px solid var(--line); background:var(--bg2); }
+  .play { width:40px; height:40px; flex:none; border-radius:50%; border:0; background:var(--acc); color:var(--acc-ink); cursor:pointer; font-size:15px; display:grid; place-items:center;
+    box-shadow:0 8px 20px -8px rgba(255,200,61,.6); transition:transform .2s; }
+  .play:hover { transform:scale(1.06); }
+  .play:disabled { opacity:.35; cursor:default; transform:none; }
+  .scrub { flex:1; position:relative; height:26px; display:flex; align-items:center; min-width:80px; }
+  .scrub input { width:100%; margin:0; -webkit-appearance:none; appearance:none; background:transparent; height:26px; cursor:pointer; position:relative; z-index:2; }
+  .scrub input::-webkit-slider-runnable-track { height:6px; border-radius:3px; background:transparent; }
+  .scrub input::-moz-range-track { height:6px; border-radius:3px; background:transparent; }
+  .scrub input::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; margin-top:-5px; border-radius:50%; background:#fff; border:3px solid var(--acc); box-shadow:0 2px 8px rgba(0,0,0,.5); }
+  .scrub input::-moz-range-thumb { width:12px; height:12px; border-radius:50%; background:#fff; border:3px solid var(--acc); }
+  .scrub .rail { position:absolute; left:0; right:0; height:6px; border-radius:3px; background:var(--line); overflow:hidden; }
+  .scrub .rail i { display:block; height:100%; width:0; background:linear-gradient(90deg, var(--water), var(--acc)); }
+  .scrub .mk { position:absolute; top:3px; width:2px; height:20px; margin-left:-1px; background:var(--line2); z-index:1; border-radius:1px; }
+  .scrub .mk.on { background:var(--acc); }
+  .tm { font:600 12px/1 var(--body); color:var(--dim); min-width:58px; text-align:right; font-variant-numeric:tabular-nums; }
+
+  /* --- адаптив --- */
+  @media (max-width: 1200px) {
+    .app { grid-template-columns:minmax(0, 1fr); }
+    .iconbtn { display:grid; place-items:center; }
+    #side { position:fixed; z-index:60; left:0; top:0; height:100%; width:min(300px, 86vw); transform:translateX(-102%); transition:transform .35s var(--ease); box-shadow:30px 0 80px rgba(0,0,0,.5); }
+    body.menu #side { transform:none; }
+    .scrim { display:block; position:fixed; inset:0; z-index:55; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity .3s; }
+    body.menu .scrim { opacity:1; pointer-events:auto; }
+  }
+  @media (max-width: 820px) {
+    .app { height:auto; }
+    main { overflow:visible; }
+    #lesson { grid-template-columns:1fr; height:auto; }
+    .stagecol { order:-1; position:sticky; top:56px; z-index:5; border-bottom:1px solid var(--line); }
+    #view { flex:none; height:min(52vh, 92vw); }
+    .doc { overflow:visible; border-right:0; }
+    .belt > span, .belt .track { display:none; }
+    .tm { display:none; }
+    .welcome { min-height:380px; justify-content:flex-end;
+      background:linear-gradient(180deg, rgba(16,20,27,.1) 0%, rgba(16,20,27,.75) 50%, var(--bg2) 78%), url(img/welcome.jpg) 62% 15% / cover no-repeat, var(--bg2); }
+  }
+  @media (max-width: 560px) {
+    .top { gap:8px; padding:0 10px; }
+    .top .logo span { display:none; }
+    .top .seg button { padding:7px 10px; font-size:12px; }
+    .iconbtn { width:34px; height:34px; }
+    .tools { gap:4px; padding:6px 8px; }
+    .tools .seg button { padding:6px 8px; font-size:11.5px; }
+    .transport { gap:8px; padding:8px 10px; }
+    .transport .seg button { padding:6px 7px; font-size:11.5px; }
+    #view { height:min(46vh, 86vw); }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="iconbtn" id="menuBtn" aria-label="Програма уроків">☰</button>
+  <a class="logo" href="index.html"><i></i>JKD <span>· Віртуальний зал</span></a>
+  <span class="sp"></span>
+  <div class="belt"><span>Шлях учня</span><div class="track"><i id="beltBar"></i></div><b id="beltTxt"></b></div>
+  <div class="seg" role="group" aria-label="Правша чи лівша"><button data-hand="right">Правша</button><button data-hand="left">Лівша</button></div>
+</header>
+
+<div class="app">
+  <aside id="side"></aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main>
+    <div id="home" hidden></div>
+
+    <div id="lesson" hidden>
+      <div class="doc">
+        <div id="docHead"></div>
+        <div class="blk"><h2>Кроки · клік — тренер стане в цей момент</h2><ol class="steps" id="steps"></ol></div>
+        <div class="blk" id="mistBlk"><h2>Типові помилки</h2><div id="mists"></div></div>
+        <div class="vidsoon">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg></span>
+          <span><b>Перевірка свого відео — в розробці.</b> Поки дивись тренера, повторюй поруч і став темп повзунком.</span>
+        </div>
+        <div class="finish" id="finish"></div>
+      </div>
+
+      <div class="stagecol" id="stagecol">
+        <div class="tools">
+          <div class="seg" id="tgBtns" role="group" aria-label="Ціль">
+            <button data-tg="opp" class="on">Суперник</button><button data-tg="mitt">Лапа</button><button data-tg="bag">Груша</button>
+          </div>
+          <span class="sp"></span>
+          <button class="tbtn on" id="kiaiBtn" title="Крик тренера в момент удару">Кіай</button>
+          <button class="tbtn" id="loopBtn" title="Повторювати по колу">⟲ Коло</button>
+        </div>
+        <div id="view"><div id="cap"><span id="capText"></span></div></div>
+        <div class="transport">
+          <button class="play" id="playBtn" aria-label="Пуск / пауза">▶</button>
+          <div class="scrub"><div class="rail"><i id="railFill"></i></div><div id="marks"></div><input type="range" id="scrub" min="0" max="1" step="0.001" value="0" aria-label="Момент руху"></div>
+          <span class="tm" id="tm"></span>
+          <div class="seg" id="spdBtns" role="group" aria-label="Швидкість">
+            <button data-s="0.15">×¼</button><button data-s="0.3" class="on">×½</button><button data-s="1">×1</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+// ===================== ПРОГРАМА =====================
+// Поки тільки руки. open — урок з 3D; інші — «скоро» (3D ще немає).
+const PROGRAM = [
+  { mod: "Основи", items: [
+    { id: "stance", name: "Стійка on guard", sub: "звідси починається все", open: true },
+    { id: "steps",  name: "Крок і підшаг", sub: "скоро" } ] },
+  { mod: "Удари руками", items: [
+    { id: "jab",   name: "Джеб — прямий передньою", sub: "головний удар JKD", open: true },
+    { id: "cross", name: "Кросс — прямий задньою", sub: "найсильніший прямий", open: true },
+    { id: "lhook", name: "Хук передньою", sub: "збоку, з розворотом", open: true },
+    { id: "rhook", name: "Хук задньої", sub: "скоро" },
+    { id: "bfist", name: "Бекфіст", sub: "скоро" },
+    { id: "upper", name: "Апперкот", sub: "скоро" } ] },
+  { mod: "Комбінації", items: [
+    { id: "c12",   name: "Раз-два", sub: "джеб → кросс", open: true },
+    { id: "c123",  name: "Раз-два-три", sub: "джеб → кросс → хук", open: true },
+    { id: "combo", name: "Джеб → довгий хук → прямий", sub: "три удари передньою", open: true } ] },
+];
+const ITEMS = PROGRAM.flatMap((g, gi) => g.items.map(i => ({ ...i, gi })));
+const OPEN = ITEMS.filter(i => i.open).map(i => i.id);
+
+// ===================== УРОКИ =====================
+// model — анімація trainer3d.html (?lesson=…); from/to — шматок анімації, який крутимо по колу; t — момент кроку.
+const LESSONS = {
+  stance: {
+    title: "Стійка on guard", model: "c12", from: 0, to: 0.17,
+    goal: "Базова позиція JKD: сильна рука попереду, тіло боком, вага на носках — з неї ти рушаєш у будь-який бік.",
+    steps: [
+      { t: 0, text: "<b>Ноги.</b> На ширині плечей, передня стопа трохи всередину, задня — під кутом." },
+      { t: 0, text: "<b>Задня п'ята піднята.</b> Як пружина: готова штовхнути тебе вперед." },
+      { t: 0, text: "<b>Передня рука</b> на лінії до цілі, лікоть трохи зігнутий і вниз." },
+      { t: 0, text: "<b>Задня рука</b> біля підборіддя, лікоть прикриває корпус." },
+      { t: 0, text: "<b>Підборіддя вниз,</b> коліна м'які, тіло розслаблене." },
+    ],
+    mist: [
+      { name: "Стоїш на всій стопі", what: "Обидві п'яти на підлозі, вага «сіла».", why: "Немає пружини — старт повільний, суперник бачить рух.", todo: "Підніми задню п'яту, вага на подушечках. Злегка «пружинь»." },
+      { name: "Тіло повернуте прямо до цілі", what: "Груди дивляться на суперника.", why: "Відкритий центр і далі до цілі для передньої руки.", todo: "Стань боком: передній бік до цілі, плечі на лінії." },
+    ],
+  },
+  jab: {
+    title: "Джеб — прямий передньою", model: "combo", from: 0, to: 0.46,
+    goal: "Найшвидший і найчастіший удар JKD: передня рука б'є з підшагом, і кулак у цілі раніше, ніж стала нога.",
+    steps: [
+      { t: 0.00, text: "<b>Стійка.</b> Передня рука на лінії до цілі." },
+      { t: 0.25, text: "<b>Рука рушає першою.</b> Без замаху й без «телеграми» плечем." },
+      { t: 0.36, text: "<b>Кулак у цілі.</b> Кулак вертикальний, плече прикриває підборіддя." },
+      { t: 0.44, text: "<b>Назад тією ж лінією.</b> Рука повертається так само прямо, не опускається." },
+    ],
+    mist: [
+      { name: "Нога раніше за руку", at: 0.36, what: "Передня нога стає на підлогу раніше, ніж кулак дійшов до цілі.", why: "Сила йде в підлогу, а суперник бачить рух ногою заздалегідь.", todo: "Спершу рука, потім нога. Повільно 10 разів: «рука — нога — нога»." },
+      { name: "Рука опускається після удару", at: 0.44, what: "Після джеба рука падає донизу.", why: "Відкрите обличчя — найпростіша контратака.", todo: "Повертай руку тією ж лінією, одразу на місце." },
+    ],
+  },
+  cross: {
+    title: "Кросс — прямий задньою", model: "c12", from: 0.2, to: 0.47,
+    goal: "Сильний прямий задньою рукою. Б'є через центр, стегно й плече повертаються разом з рукою.",
+    steps: [
+      { t: 0.24, text: "<b>Старт.</b> Задня рука біля підборіддя, вага на передній нозі." },
+      { t: 0.267, text: "<b>Поворот стегна.</b> Задня п'ята розвертається назовні, рука летить прямо." },
+      { t: 0.30, text: "<b>Удар.</b> Плече до підборіддя, кулак — у центр." },
+      { t: 0.357, text: "<b>Повернення.</b> Рука назад до підборіддя, стійка відновлена." },
+    ],
+    mist: [
+      { name: "Б'є лише рука", at: 0.267, what: "Стегно й задня стопа стоять на місці.", why: "Без повороту тіла кросс слабкий — працює тільки плече.", todo: "Розверни задню п'яту назовні — і стегно саме потягне руку." },
+      { name: "Задня рука з замаху", at: 0.24, what: "Перед ударом рука йде назад.", why: "Замах видно — суперник встигає закритися.", todo: "Бий прямо від підборіддя, без руху назад." },
+    ],
+  },
+  lhook: {
+    title: "Хук передньою", model: "c123", from: 0.3, to: 0.66,
+    goal: "Удар збоку передньою рукою. Б'є розворотом стоп і стегна, а не самою рукою — і закриває стійку.",
+    steps: [
+      { t: 0.30, text: "<b>Старт</b> — після прямого вага трохи на передній нозі." },
+      { t: 0.337, text: "<b>Стегно першим.</b> Передня стопа розвертається, рука ще відстає." },
+      { t: 0.417, text: "<b>Удар.</b> Лікоть на висоті кулака, рука зігнута ~90°." },
+      { t: 0.637, text: "<b>Стійка закрита.</b> Після хука ти знову в стійці JKD." },
+    ],
+    mist: [
+      { name: "Хук без розвороту стопи", at: 0.337, what: "Передня стопа не розвертається, крутиться тільки рука.", why: "Удар довгий і слабкий, стійка лишається відкритою.", todo: "Почни хук стегном і розворотом передньої стопи, рука відстає на мить." },
+      { name: "Лікоть опущений", at: 0.417, what: "Лікоть нижче кулака — хук іде «знизу».", why: "Кулак ковзає, а не б'є, і відкривається голова.", todo: "Тримай лікоть на висоті кулака, рука як гак." },
+    ],
+  },
+  c12: {
+    title: "Раз-два: джеб → кросс", model: "c12", from: 0, to: 0.5,
+    goal: "Найшвидша серія з двох ударів: джеб відкриває, кросс добиває. Між ними — ніякої паузи.",
+    steps: [
+      { t: 0.00, text: "<b>Стійка.</b>" },
+      { t: 0.24, text: "<b>Джеб.</b> Рука рушає першою." },
+      { t: 0.267, text: "<b>Кросс уже в дорозі,</b> поки джеб повертається — один рух «туди-назад»." },
+      { t: 0.30, text: "<b>Кросс у цілі</b> раніше, ніж стала задня нога." },
+      { t: 0.357, text: "<b>Відновлення.</b> Ти в позиції для хука." },
+      { t: 0.457, text: "<b>Відхід.</b> Крок назад — безпечна дистанція." },
+    ],
+    mist: [
+      { name: "Пауза між джебом і кросом", at: 0.267, what: "Джеб повністю повертається, і лише тоді йде кросс.", why: "Суперник встигає закритися після першого удару.", todo: "Тягни джеб назад — і цим самим рухом корпусу штовхай кросс." },
+    ],
+  },
+  c123: {
+    title: "Раз-два-три: джеб → кросс → хук", model: "c123", from: 0, to: 0.78,
+    goal: "Одна з найприродніших серій. Хук у кінці не лише б'є, а й повертає тебе в безпечну стійку.",
+    steps: [
+      { t: 0.00, text: "<b>Стійка.</b>" },
+      { t: 0.18, text: "<b>Джеб.</b>" },
+      { t: 0.267, text: "<b>Кросс</b> без паузи після джеба." },
+      { t: 0.337, text: "<b>Після кросу стійка відкрита</b> — треба закрити." },
+      { t: 0.417, text: "<b>Хук передньою</b> з розворотом стоп — закриває стійку." },
+      { t: 0.637, text: "<b>Знову в стійці.</b>" },
+      { t: 0.737, text: "<b>Відхід.</b>" },
+    ],
+    mist: [
+      { name: "Хук не закриває стійку", at: 0.637, what: "Після хука передня стопа не розвернулась.", why: "Відкритий центр — найпростіше місце для контратаки.", todo: "Бий хук з розворотом передньої стопи й стегна." },
+    ],
+  },
+  combo: {
+    title: "Джеб → довгий хук → прямий", model: "combo", from: 0, to: 1.05,
+    goal: "Три удари передньою рукою однією хвилею: джеб з підшагом, довгий хук без повернення руки, сильний прямий і відхід.",
+    steps: [
+      { t: 0.00, text: "<b>Стійка.</b>" },
+      { t: 0.36, text: "<b>Джеб з підшагом.</b> Рука рушає першою." },
+      { t: 0.53, text: "<b>Довгий хук.</b> Рука не повертається — з прямого одразу дуга збоку." },
+      { t: 0.74, text: "<b>Крок назад.</b> Спершу задня нога, потім передня." },
+      { t: 0.86, text: "<b>Прямий з кіаєм.</b> Поштовх задньою ногою." },
+      { t: 0.98, text: "<b>Відхід.</b> Push step назад." },
+    ],
+    mist: [
+      { name: "Хук довгий і повільний", at: 0.49, what: "Плечі й стегна крутяться разом, хук «тягнеться».", why: "Без стегна першим у плечі немає натягу.", todo: "Почни хук стегном, рука відстає на мить." },
+      { name: "Рука повертається до підборіддя між ударами", at: 0.53, what: "Після джеба рука йде назад, і тільки потім хук.", why: "Втрачається час — суперник встигає закритися.", todo: "З прямого одразу дуга збоку, без повернення." },
+    ],
+  },
+};
+
+// ===================== СТАН =====================
+const $ = id => document.getElementById(id);
+function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+const state = { cur: null, step: -1, passed: new Set(JSON.parse(safeGet("jkdPassed") || "[]").filter(id => OPEN.includes(id))) };
+
+// звук для 3D-тренера: AudioContext створюємо тут — у цьому вікні користувач клікає
+let audio = null;
+window.jkdAudio = () => { try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} return audio; };
+addEventListener("pointerdown", () => { const a = window.jkdAudio(); if (a) a.resume(); });
+
+let toastT = 0;
+function toast(html) { const t = $("toast"); t.innerHTML = html; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 3000); }
+
+// ===================== ПРОГРАМА =====================
+const status = id => state.passed.has(id) ? "done" : ITEMS.find(i => i.id === id).open ? "open" : "lock";
+const stIcon = s => `<span class="st ${s}">${s === "done" ? "✓" : s === "open" ? "▶" : ""}</span>`;
+function renderProgram() {
+  let html = `<button class="homelink${state.cur ? "" : " on"}" data-go="">◎ Огляд залу</button>`;
+  PROGRAM.forEach((g, gi) => {
+    html += `<h4><span>0${gi}</span>${g.mod}</h4>`;
+    g.items.forEach(it => html += `<button class="li${it.open ? "" : " locked"}${state.cur === it.id ? " on" : ""}" data-go="${it.id}">${stIcon(status(it.id))}<span>${it.name}<small>${it.sub}</small></span></button>`);
+  });
+  html += `<div class="soonbox"><b>Скоро</b>Удари ногами, перевірка свого відео, твій персонаж.</div>`;
+  $("side").innerHTML = html;
+  $("side").querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+  const n = OPEN.filter(id => state.passed.has(id)).length;
+  $("beltBar").style.width = (n / OPEN.length * 100) + "%"; $("beltTxt").textContent = `${n} / ${OPEN.length}`;
+}
+function go(id) {
+  document.body.classList.remove("menu");
+  if (!id) return showHome();
+  const it = ITEMS.find(i => i.id === id);
+  if (!it.open) return toast(`«${it.name}» — урок ще готується`);
+  startLesson(id);
+}
+$("menuBtn").onclick = () => document.body.classList.toggle("menu");
+$("scrim").onclick = () => document.body.classList.remove("menu");
+
+// ===================== ОГЛЯД ЗАЛУ =====================
+function showHome() {
+  state.cur = null; renderProgram(); player.stop();
+  history.replaceState(null, "", location.pathname);
+  $("lesson").hidden = true; $("home").hidden = false;
+  const next = OPEN.find(id => !state.passed.has(id));
+  let html = `<div class="welcome anim"><div class="eyebrow">Вітаю в залі</div><h1>Будь як <em>вода</em></h1>
+    <p>Дивись 3D-тренера, ставь паузу, крути повзунок і повторюй поруч. Почни зі стійки — далі удари руками й серії.</p>
+    <div>${next ? `<button class="btn pri" data-go="${next}">${state.passed.size ? "Продовжити" : "Почати"}: ${LESSONS[next].title} <span class="arr">→</span></button>`
+                : `<span class="chip">Усі відкриті уроки пройдено ✓</span>`}</div></div>`;
+  PROGRAM.forEach((g, gi) => {
+    html += `<div class="modh"><span>0${gi}</span><h2>${g.mod}</h2></div><div class="cards anim">`;
+    g.items.forEach((it, i) => {
+      const s = status(it.id);
+      html += `<button class="lc${it.open ? "" : " locked"}${s === "done" ? " done" : ""}" style="--i:${i}" data-go="${it.id}">${stIcon(s)}<h3>${it.name}</h3><p>${it.sub}</p></button>`;
+    });
+    html += `</div>`;
+  });
+  $("home").innerHTML = html;
+  $("home").querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+  document.querySelector("main").scrollTo({ top: 0 });
+}
+
+// ===================== УРОК =====================
+function startLesson(id) {
+  const L = LESSONS[id], it = ITEMS.find(i => i.id === id);
+  state.cur = id; state.step = -1;
+  history.replaceState(null, "", "?lesson=" + id);
+  renderProgram();
+  $("home").hidden = true; $("lesson").hidden = false;
+  $("docHead").innerHTML = `<div class="anim"><div class="eyebrow">0${it.gi} · ${PROGRAM[it.gi].mod}</div><h1>${L.title}</h1><p class="goal">${L.goal}</p></div>`;
+  $("steps").className = "steps anim";
+  $("steps").innerHTML = L.steps.map((s, i) => `<li style="--i:${i}"><button class="step" data-i="${i}"><span class="k">${i + 1}</span><span>${s.text}</span></button></li>`).join("");
+  $("steps").querySelectorAll(".step").forEach(b => b.onclick = () => pickStep(+b.dataset.i));
+  $("mistBlk").hidden = !L.mist.length;
+  $("mists").innerHTML = L.mist.map((m, k) => `<details class="mist"><summary>${m.name}</summary><div class="body">
+      <div><dt>Що не так</dt><dd>${m.what}</dd></div><div><dt>Чому</dt><dd>${m.why}</dd></div><div><dt class="todo">Що робити</dt><dd class="todo">${m.todo}</dd></div>
+      ${m.at != null ? `<button class="btn sm" data-k="${k}">▶ Показати в 3D, як треба</button>` : ""}</div></details>`).join("");
+  $("mists").querySelectorAll("[data-k]").forEach(b => b.onclick = () => { const m = L.mist[+b.dataset.k]; player.seek(m.at); caption(`<b>Як треба:</b> ${m.todo}`); toStage(); });
+  const i = OPEN.indexOf(id), next = OPEN[i + 1], done = state.passed.has(id);
+  $("finish").innerHTML = `<button class="btn ${done ? "" : "pri"} sm" id="doneBtn">${done ? "Відпрацьовано ✓" : "Я відпрацював ✓"}</button>`
+    + (next ? `<button class="btn sm" data-go="${next}">Далі: ${LESSONS[next].title} →</button>` : "");
+  $("doneBtn").onclick = () => {
+    state.passed.add(id); safeSet("jkdPassed", JSON.stringify([...state.passed])); renderProgram();
+    toast(next ? `Зараховано ✓ Далі — «${LESSONS[next].title}»` : "Усі відкриті уроки пройдено ✓ Будь як вода!");
+    if (next) startLesson(next); else startLesson(id);
+  };
+  $("finish").querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+  player.load(L);
+  caption("");
+  document.querySelector("main").scrollTo({ top: 0 }); scrollTo({ top: 0 });
+}
+function pickStep(i) {
+  const L = LESSONS[state.cur], s = L.steps[i];
+  state.step = i; markSteps();
+  player.seek(s.t); caption(`<b>${i + 1}.</b> ${s.text.replace(/<\/?b>/g, "")}`);
+  toStage();
+}
+function markSteps() {
+  $("steps").querySelectorAll(".step").forEach((b, j) => b.classList.toggle("on", j === state.step));
+  document.querySelectorAll("#marks .mk").forEach((m, j) => m.classList.toggle("on", j === state.step));
+}
+function caption(html) { $("capText").innerHTML = html; }
+function toStage() { if (innerWidth <= 820) $("stagecol").scrollIntoView({ behavior: "smooth", block: "start" }); }
+
+// ===================== ПЛЕЄР: керуємо 3D-тренером через його #time / #play / #spd =====================
+const player = (() => {
+  let iframe = null, model = null, L = null, raf = 0, loop = true, speed = 0.3, holdUntil = 0, pending = null, lastT = 0;
+  const ui = { tg: "opp", kiai: true, left: safeGet("jkdHand") === "left" };
+  const doc = () => { try { return iframe && iframe.contentDocument; } catch (e) { return null; } };
+  const el = id => { const d = doc(); return d && d.getElementById(id); };
+  const isPlaying = () => { const p = el("play"); return !!p && p.textContent.includes("⏸"); };
+  const setT = t => { const tm = el("time"); if (tm) { tm.value = t; tm.dispatchEvent(new Event("input")); } };
+  const play = on => { if (isPlaying() !== on) { const p = el("play"); if (p) p.click(); } };
+  function apply() {
+    const d = doc(); if (!d) return;
+    const b = d.querySelector(`[data-tg="${ui.tg}"]`); if (b) b.click();
+    const sp = el("spd"); if (sp) { sp.value = speed; sp.dispatchEvent(new Event("input")); }
+    const w = iframe.contentWindow;
+    if (w.setKiai) w.setKiai(ui.kiai);
+    if (w.setMirror) w.setMirror(ui.left);
+  }
+  function tick(now) {
+    raf = requestAnimationFrame(tick);
+    const tm = el("time"); if (!tm || !L) return;
+    const t = +tm.value, span = L.to - L.from || 1;
+    if (isPlaying() && t >= L.to - 0.002) {               // кінець шматка: коротка пауза і знову з початку
+      play(false); setT(L.to);
+      if (loop) holdUntil = now + 700;
+    }
+    if (holdUntil && now >= holdUntil) { holdUntil = 0; setT(L.from); play(true); }
+    if (t !== lastT) { lastT = t; $("scrub").value = t; $("railFill").style.width = Math.max(0, Math.min(100, (t - L.from) / span * 100)) + "%"; $("tm").textContent = `${(t - L.from).toFixed(2)} / ${span.toFixed(2)}`; }
+    $("playBtn").textContent = isPlaying() || holdUntil ? "❚❚" : "▶";
+  }
+  function load(lesson) {
+    L = lesson; holdUntil = 0;
+    const sc = $("scrub"); sc.min = L.from; sc.max = L.to; sc.value = L.from;
+    const span = L.to - L.from || 1;
+    $("marks").innerHTML = L.steps.map(s => `<span class="mk" style="left:${(s.t - L.from) / span * 100}%"></span>`).join("");
+    if (L.model !== model || !iframe) {
+      model = L.model;
+      const v = $("view"); v.querySelectorAll("iframe").forEach(f => f.remove());
+      iframe = document.createElement("iframe"); iframe.title = "3D-тренер";
+      iframe.src = `trainer3d.html?lesson=${L.model}&embed=1&hero=1${ui.left ? "&hand=left" : ""}`;
+      iframe.onload = () => { apply(); setT(pending != null ? pending : L.from); if (pending == null) play(true); pending = null; };
+      v.prepend(iframe);
+    } else { setT(L.from); play(true); }
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+  }
+  return {
+    load, apply, ui,
+    stop() { cancelAnimationFrame(raf); play(false); },
+    seek(t) { holdUntil = 0; if (!el("time")) { pending = t; return; } play(false); setT(t); },
+    toggle() {
+      if (isPlaying() || holdUntil) { holdUntil = 0; play(false); return; }
+      const tm = el("time"); if (tm && (+tm.value >= L.to - 0.01 || +tm.value < L.from)) setT(L.from);
+      state.step = -1; markSteps(); caption(""); play(true);
+    },
+    scrub(t) { holdUntil = 0; play(false); setT(t); },
+    speed(s) { speed = s; apply(); },
+    loop(on) { loop = on; },
+  };
+})();
+$("playBtn").onclick = () => player.toggle();
+$("scrub").oninput = e => player.scrub(+e.target.value);
+document.querySelectorAll("#spdBtns button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#spdBtns button").forEach(x => x.classList.toggle("on", x === b)); player.speed(+b.dataset.s);
+});
+document.querySelectorAll("#tgBtns button").forEach(b => b.onclick = () => {
+  player.ui.tg = b.dataset.tg; document.querySelectorAll("#tgBtns button").forEach(x => x.classList.toggle("on", x === b)); player.apply();
+});
+$("kiaiBtn").onclick = () => { player.ui.kiai = !player.ui.kiai; $("kiaiBtn").classList.toggle("on", player.ui.kiai); player.apply(); };
+$("loopBtn").classList.add("on");
+$("loopBtn").onclick = () => { const on = !$("loopBtn").classList.contains("on"); $("loopBtn").classList.toggle("on", on); player.loop(on); };
+addEventListener("keydown", e => {
+  if (e.target.closest("input, select, textarea") && e.target.id !== "scrub") return;
+  if (e.code === "Space" && state.cur) { e.preventDefault(); player.toggle(); }
+});
+
+// правша / лівша
+function showHand() { document.querySelectorAll("[data-hand]").forEach(b => b.classList.toggle("on", (b.dataset.hand === "left") === player.ui.left)); }
+document.querySelectorAll("[data-hand]").forEach(b => b.onclick = () => {
+  const left = b.dataset.hand === "left"; if (left === player.ui.left) return;
+  player.ui.left = left; safeSet("jkdHand", left ? "left" : "right"); showHand(); player.apply();
+  toast(left ? "Ти <b>лівша</b>: передня — ліва рука. Модель дзеркальна." : "Ти <b>правша</b>: передня — права рука.");
+});
+showHand();
+
+// ===================== СТАРТ =====================
+const want = new URLSearchParams(location.search).get("lesson");
+if (want && LESSONS[want]) startLesson(want); else showHome();
+</script>
+</body>
+</html>

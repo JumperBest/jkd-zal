@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JKD Віртуальний зал</title>
+<!-- Головна сторінка макета. Уроки — lessons.html, 3D-тренер — trainer3d.html, спільний стиль — site.css. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="site.css">
+<style>
+  body { overflow-x:clip; }
+  .wrap { max-width:1200px; margin:0 auto; padding:0 24px; }
+
+  /* --- шапка --- */
+  header { position:fixed; inset:0 0 auto; z-index:50; transition:background .3s, border-color .3s, backdrop-filter .3s; border-bottom:1px solid transparent; }
+  header.solid { background:rgba(11,14,19,.78); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-color:var(--line); }
+  header .wrap { height:68px; display:flex; align-items:center; gap:28px; }
+  header nav { margin-left:auto; display:flex; gap:26px; font-size:14px; font-weight:600; color:var(--muted); }
+  header nav a { text-decoration:none; position:relative; transition:color .2s; }
+  header nav a::after { content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:var(--acc); transform:scaleX(0); transition:transform .3s var(--ease); }
+  header nav a:hover { color:var(--text); }
+  header nav a:hover::after { transform:scaleX(1); }
+
+  /* --- головний екран --- */
+  .hero { position:relative; display:flex; align-items:center; min-height:min(92vh, 860px); padding:92px 0 48px; overflow:hidden; isolation:isolate; }
+  .hero .bg { position:absolute; inset:0; z-index:-2; background:url(img/hero.jpg) 72% center / cover no-repeat; animation:zoom 22s var(--ease) both; }
+  @keyframes zoom { from { transform:scale(1.08); } }
+  .hero::before { content:""; position:absolute; inset:0; z-index:-1;
+    background:linear-gradient(90deg, var(--bg) 0%, rgba(11,14,19,.85) 32%, rgba(11,14,19,.15) 62%, transparent 80%),
+               linear-gradient(180deg, transparent 65%, var(--bg)); }
+  .hero .wrap { width:100%; }
+  .hero .txt { max-width:600px; }
+  .hero h1 { font-size:clamp(48px, 6.6vw, 96px); font-weight:900; line-height:.92; letter-spacing:-.045em; margin:16px 0 20px; text-transform:uppercase; }
+  .hero h1 em { font-style:normal; display:inline-block; background:linear-gradient(100deg, var(--water) 0%, var(--water2) 30%, #fff 50%, var(--water2) 70%, var(--water) 100%);
+    background-size:220% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:shine 7s linear infinite; }
+  @keyframes shine { to { background-position:-220% 0; } }
+  .hero .lead { font-size:clamp(17px, 1.5vw, 19px); color:var(--muted); max-width:31em; margin:0 0 24px; }
+  .hero .lead b { color:var(--text); font-weight:600; }
+  .actions { display:flex; flex-wrap:wrap; gap:12px; }
+  .hand { margin-top:20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-size:14px; color:var(--muted); }
+  .stats { display:flex; gap:34px; margin-top:28px; padding-top:18px; border-top:1px solid var(--line); }
+  .stats b { display:block; font:700 30px/1 var(--display); color:var(--text); letter-spacing:-.03em; }
+  .stats span { font-size:13px; color:var(--dim); }
+
+  .stage { position:relative; aspect-ratio:1 / 1; width:100%; border-radius:28px; background:var(--stage); overflow:hidden;
+    box-shadow:0 0 0 1px var(--line), 0 40px 120px -30px rgba(63,162,255,.35), 0 0 0 10px rgba(255,255,255,.015); }
+  .stage iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .stage .lbl { position:absolute; left:16px; bottom:16px; display:flex; align-items:center; gap:8px; background:rgba(11,14,19,.8); backdrop-filter:blur(8px);
+    border:1px solid var(--line); border-radius:999px; padding:7px 14px; font-size:12px; font-weight:600; color:var(--muted); pointer-events:none; }
+  .stage .lbl i { width:8px; height:8px; border-radius:50%; background:var(--ok); box-shadow:0 0 0 0 var(--ok); animation:pulse 2s infinite; }
+  @keyframes pulse { 70% { box-shadow:0 0 0 8px rgba(67,211,154,0); } 100% { box-shadow:0 0 0 0 rgba(67,211,154,0); } }
+  .stage-wrap { position:relative; max-width:520px; }
+  .stage-wrap .kanji { position:absolute; left:-70px; top:50%; transform:translateY(-50%); writing-mode:vertical-rl; font:900 120px/1 "Noto Serif SC", "SimSun", serif;
+    color:transparent; -webkit-text-stroke:1px rgba(255,200,61,.16); z-index:-1; user-select:none; letter-spacing:.1em; }
+  .corner { position:absolute; width:34px; height:34px; border:2px solid var(--acc); z-index:2; pointer-events:none; }
+  .corner.tl { left:-10px; top:-10px; border-right:0; border-bottom:0; border-radius:12px 0 0 0; }
+  .corner.br { right:-10px; bottom:-10px; border-left:0; border-top:0; border-radius:0 0 12px 0; }
+
+  .scroll-hint { position:absolute; left:50%; bottom:22px; transform:translateX(-50%); width:24px; height:38px; border:2px solid var(--line2); border-radius:14px; }
+  .scroll-hint::after { content:""; position:absolute; left:50%; top:7px; width:4px; height:8px; margin-left:-2px; border-radius:2px; background:var(--acc); animation:drop 1.8s var(--ease) infinite; }
+  @keyframes drop { 0% { opacity:0; transform:translateY(0); } 30% { opacity:1; } 100% { opacity:0; transform:translateY(14px); } }
+
+  /* --- жовта стрічка --- */
+  .band { background:var(--acc); color:var(--acc-ink); overflow:hidden; transform:rotate(-1.4deg) scale(1.03); margin:4px 0 8px; box-shadow:0 18px 50px -20px rgba(255,200,61,.5); }
+  .band::after { content:""; display:block; height:7px; background:#111; }
+  .band .track { display:flex; width:max-content; animation:marquee 38s linear infinite; }
+  .band span { font:900 clamp(18px, 2.2vw, 26px)/1 var(--display); text-transform:uppercase; letter-spacing:-.01em; padding:12px 0; white-space:nowrap; }
+  .band span::after { content:"●"; font-size:.5em; vertical-align:middle; margin:0 28px; }
+  @keyframes marquee { to { transform:translateX(-50%); } }
+
+  /* --- секції --- */
+  section { padding:56px 0; position:relative; }
+  .sh { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:end; margin-bottom:28px; }
+  .sh h2 { font-size:clamp(28px, 3.4vw, 44px); margin-top:12px; }
+  .sh p { color:var(--muted); font-size:17px; margin:0; max-width:30em; }
+
+  /* цитата */
+  .quote { padding:96px 24px; text-align:center; max-width:none; position:relative; isolation:isolate;
+    background:radial-gradient(55% 48% at 50% 44%, rgba(7,9,13,.82), rgba(7,9,13,.45) 70%, transparent),
+      linear-gradient(180deg, var(--bg), rgba(11,14,19,.45) 30%, rgba(11,14,19,.45) 70%, var(--bg)), url(img/quote.jpg) center 22% / cover no-repeat; }
+  .quote blockquote { margin:0 auto; max-width:16em; text-shadow:0 2px 24px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.6); font:700 clamp(28px, 4.2vw, 56px)/1.06 var(--display); letter-spacing:-.035em; }
+  .quote blockquote .w { display:inline-block; opacity:.15; transition:opacity .6s var(--ease), color .6s; transition-delay:calc(var(--i) * 90ms); }
+  .quote.in blockquote .w { opacity:1; }
+  .quote.in blockquote .w.water { color:var(--water2); }
+  .quote cite { display:inline-block; margin-top:22px; font-style:normal; color:var(--acc); font-weight:700; letter-spacing:.18em; text-transform:uppercase; font-size:13px;
+    background:rgba(7,9,13,.7); border:1px solid rgba(255,200,61,.35); border-radius:999px; padding:8px 16px; backdrop-filter:blur(6px); }
+  .quote cite::before { content:""; display:inline-block; width:24px; height:2px; background:var(--acc); vertical-align:middle; margin-right:10px; }
+
+  /* принципи */
+  .princ { display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; }
+  .princ article { background:var(--bg); padding:0 0 24px; position:relative; transition:background .4s; overflow:hidden; }
+  .princ article > :not(.ph) { margin-left:24px; margin-right:24px; }
+  .princ .ph { aspect-ratio:16 / 10; background:#0a0c10 center 30% / cover no-repeat; margin-bottom:-28px; transition:transform .8s var(--ease);
+    -webkit-mask:linear-gradient(180deg, #000 55%, transparent); mask:linear-gradient(180deg, #000 55%, transparent); }
+  .princ article:hover .ph { transform:scale(1.05); }
+  .princ .num { position:relative; }
+  .princ article:hover { background:var(--bg2); }
+  .princ .num { font:900 56px/1 var(--display); color:transparent; -webkit-text-stroke:1.5px var(--line2); letter-spacing:-.05em; transition:-webkit-text-stroke-color .4s; }
+  .princ article:hover .num { -webkit-text-stroke-color:var(--acc); }
+  .princ h3 { font-size:22px; margin:14px 0 8px; }
+  .princ p { color:var(--muted); margin:0; }
+
+  /* як це працює */
+  .howgrid { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:48px; align-items:center; }
+  .flow { display:grid; gap:22px; position:relative; }
+  .flow::before { content:""; position:absolute; left:27px; top:28px; bottom:28px; width:2px; background:linear-gradient(180deg, var(--acc), var(--water) 60%, var(--line)); opacity:.6; }
+  .flow article { position:relative; display:grid; grid-template-columns:56px 1fr; gap:0 18px; }
+  .flow article .n { grid-row:span 2; margin:0; }
+  .flow .n { width:56px; height:56px; border-radius:50%; display:grid; place-items:center; background:var(--bg); border:2px solid var(--acc); color:var(--acc);
+    font:700 20px/1 var(--display); margin-bottom:14px; position:relative; }
+  .flow article:nth-child(n+3) .n { border-color:var(--water); color:var(--water2); }
+  .flow h3 { font-size:20px; margin-bottom:8px; }
+  .flow p { color:var(--muted); margin:0; font-size:15px; }
+
+  /* програма */
+  .prog { display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; }
+  .mod { background:linear-gradient(180deg, var(--panel), var(--bg2)); border:1px solid var(--line); border-radius:var(--r); padding:20px 18px; transition:transform .4s var(--ease), border-color .3s; }
+  .mod:hover { transform:translateY(-6px); border-color:var(--line2); }
+  .mod .k { font:700 13px/1 var(--display); color:var(--acc); }
+  .mod h3 { font-size:19px; margin:8px 0 10px; }
+  .mod ul { list-style:none; margin:0; padding:0; }
+  .mod li { border-top:1px solid var(--line); }
+  .mod li a, .mod li span { display:flex; align-items:center; gap:10px; padding:7px 0; font-size:14px; text-decoration:none; color:var(--dim); }
+  .mod li a { color:var(--text); font-weight:600; transition:color .2s, padding .3s var(--ease); }
+  .mod li a:hover { color:var(--acc); padding-left:6px; }
+  .mod li a::before { content:"▶"; font-size:9px; width:20px; height:20px; display:grid; place-items:center; flex:none; border-radius:50%; background:var(--acc); color:var(--acc-ink); }
+  .mod li span::before { content:""; width:20px; height:20px; flex:none; border-radius:50%; border:1px dashed var(--line2); }
+
+  /* персонаж */
+  .soon { display:grid; grid-template-columns:auto 1fr auto; gap:36px; align-items:center; padding:24px 28px; border-radius:20px; border:1px solid var(--line);
+    background:radial-gradient(80% 140% at 0% 50%, rgba(63,162,255,.14), transparent 60%), var(--bg2); }
+  .soon svg { width:60px; height:80px; }
+  .soon h3 { font-size:28px; margin-bottom:8px; }
+  .soon p { margin:0; color:var(--muted); max-width:36em; }
+
+  /* заклик */
+  .cta { text-align:center; padding:120px 0 130px; position:relative; overflow:hidden; isolation:isolate;
+    background:linear-gradient(180deg, var(--bg), rgba(11,14,19,.45) 35%, rgba(11,14,19,.55) 75%, var(--bg)), url(img/cta.jpg) center 40% / cover no-repeat; }
+  .cta h2 { text-shadow:0 6px 40px rgba(0,0,0,.6); }
+  .cta::before { content:""; position:absolute; left:50%; top:50%; width:900px; height:900px; transform:translate(-50%, -50%); border-radius:50%;
+    background:repeating-radial-gradient(circle, transparent 0 58px, rgba(63,162,255,.07) 58px 60px); animation:ripple 9s linear infinite; z-index:-1;
+    -webkit-mask:radial-gradient(circle, #000 20%, transparent 70%); mask:radial-gradient(circle, #000 20%, transparent 70%); opacity:.6; }
+  @keyframes ripple { to { transform:translate(-50%, -50%) scale(1.15); } }
+  .cta h2 { font-size:clamp(32px, 4.4vw, 60px); font-weight:900; text-transform:uppercase; letter-spacing:-.045em; margin:14px 0 26px; }
+  .cta h2 em { font-style:normal; color:var(--acc); }
+
+  footer { border-top:1px solid var(--line); color:var(--dim); font-size:13px; padding:28px 0 40px; }
+  footer .wrap { display:flex; gap:24px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+
+  @media (max-width: 980px) {
+    header nav { display:none; }
+    .hero { min-height:88vh; align-items:flex-end; padding-top:96px; }
+    .hero .bg { background-position:78% center; }
+    .hero::before { background:linear-gradient(180deg, rgba(11,14,19,.2) 0%, rgba(11,14,19,.55) 45%, var(--bg) 82%); }
+    .howgrid { grid-template-columns:1fr; gap:32px; }
+    .stage-wrap { max-width:none; }
+    .stage-wrap .kanji { display:none; }
+    .sh { grid-template-columns:1fr; gap:10px; margin-bottom:22px; }
+    .princ { grid-template-columns:1fr; }
+    .prog { grid-template-columns:1fr 1fr; }
+    .soon { grid-template-columns:1fr; gap:20px; padding:30px 26px; }
+    section { padding:44px 0; }
+    .scroll-hint { display:none; }
+    .quote { padding:64px 16px; }
+    .cta { padding:90px 0; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding:0 16px; }
+    header .btn { display:none; }
+    .prog { grid-template-columns:1fr; }
+    .stats { gap:22px; }
+    .stats b { font-size:24px; }
+
+    .actions .btn { flex:1 1 100%; }
+  }
+</style>
+</head>
+<body>
+<header id="top"><div class="wrap">
+  <a class="logo" href="index.html"><i></i>JKD <span>· Віртуальний зал</span></a>
+  <nav><a href="#how">Як це працює</a><a href="#program">Програма</a></nav>
+  <a class="btn sm pri" href="lessons.html">Увійти в зал</a>
+</div></header>
+
+<div class="hero">
+  <div class="bg" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="txt">
+      <div class="eyebrow rv">Jeet Kune Do · віртуальний зал</div>
+      <h1 class="rv" style="--d:.08s">Будь<br>як <em>вода</em></h1>
+      <p class="lead rv" style="--d:.16s"><b>3D-тренер</b> показує кожен удар по кроках. Став паузу, крути повзунок, сповільнюй — і повторюй поруч.</p>
+      <div class="actions rv" style="--d:.24s">
+        <a class="btn pri" href="lessons.html">Почати навчання <span class="arr">→</span></a>
+        <a class="btn" href="lessons.html?lesson=c123">Спробувати раз-два-три</a>
+      </div>
+      <div class="hand rv" style="--d:.32s">Твоя стійка:
+        <div class="seg" role="group" aria-label="Правша чи лівша"><button data-hand="right">Правша</button><button data-hand="left">Лівша</button></div>
+      </div>
+      <div class="stats rv" style="--d:.4s">
+        <div><b>7</b><span>уроків з 3D</span></div>
+        <div><b>×¼</b><span>сповільнення</span></div>
+        <div><b>3</b><span>цілі: суперник, лапа, груша</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint" aria-hidden="true"></div>
+</div>
+
+<div class="band" aria-hidden="true"><div class="track" id="band"></div></div>
+
+<div class="quote wrap" id="quote">
+  <blockquote id="qtext">Будь безформним, як вода, друже мій.</blockquote>
+  <cite>Брюс Лі</cite>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="eyebrow rv">Основа</div><h2 class="rv" style="--d:.08s">Три принципи JKD</h2></div>
+      <p class="rv" style="--d:.16s">На них стоїть кожен урок — від стійки до серій ударів.</p>
+    </div>
+    <div class="princ">
+      <article class="rv"><div class="ph" style="background-image:url(img/princip_1.jpg)"></div><div class="num">01</div><h3>Простота</h3><p>Прибирай зайве. Найкращий рух — той, у якому немає нічого лишнього.</p></article>
+      <article class="rv" style="--d:.1s"><div class="ph" style="background-image:url(img/princip_2.jpg)"></div><div class="num">02</div><h3>Прямота</h3><p>Найкоротший шлях до цілі. Рука рушає раніше за ногу — завжди.</p></article>
+      <article class="rv" style="--d:.2s"><div class="ph" style="background-image:url(img/princip_3.jpg)"></div><div class="num">03</div><h3>Свобода</h3><p>Бери те, що працює для тебе, відкидай те, що ні. Без зайвих правил і форм.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="eyebrow rv">Урок</div><h2 class="rv" style="--d:.08s">Як це працює</h2></div>
+      <p class="rv" style="--d:.16s">Дивишся, розбираєш по кроках, тренуєшся поруч. Перевірка відео — скоро.</p>
+    </div>
+    <div class="howgrid">
+      <div class="stage-wrap rv">
+        <div class="kanji" aria-hidden="true">截拳道</div>
+        <span class="corner tl"></span><span class="corner br"></span>
+        <div class="stage">
+          <iframe id="hero3d" title="3D-тренер" src="trainer3d.html?lesson=c123&embed=1&hero=1"></iframe>
+          <div class="lbl"><i></i>3D-тренер · раз-два-три · крути мишкою</div>
+        </div>
+      </div>
+      <div class="flow">
+      <article class="rv"><div class="n">1</div><h3>Дивишся</h3><p>3D-тренер б'є по суперникові, лапі чи груші. Крути камеру мишкою.</p></article>
+      <article class="rv" style="--d:.1s"><div class="n">2</div><h3>Розбираєш</h3><p>Клік по кроку — тренер завмирає. Повзунок, пауза, швидкість ×¼ / ×½ / ×1.</p></article>
+      <article class="rv" style="--d:.2s"><div class="n">3</div><h3>Тренуєшся поруч</h3><p>Повторюй разом з тренером по колу. Типові помилки — з показом у 3D.</p></article>
+      <article class="rv" style="--d:.3s"><div class="n">4</div><h3>Розбір свого відео <span class="chip" style="vertical-align:middle">скоро</span></h3><p>Знімеш себе — система скаже, що не так, чому і що робити.</p></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="program">
+  <div class="wrap">
+    <div class="sh">
+      <div><div class="eyebrow rv">Програма</div><h2 class="rv" style="--d:.08s">Від стійки до серій</h2></div>
+      <p class="rv" style="--d:.16s">Поки — удари руками. Уроки з ▶ уже відкриті.</p>
+    </div>
+    <div class="prog">
+      <div class="mod rv"><div class="k">00</div><h3>Основи</h3><ul><li><a href="lessons.html?lesson=stance">Стійка on guard</a></li><li><span>Крок і підшаг</span></li></ul></div>
+      <div class="mod rv" style="--d:.08s"><div class="k">01</div><h3>Удари руками</h3><ul><li><a href="lessons.html?lesson=jab">Джеб</a></li><li><a href="lessons.html?lesson=cross">Кросс</a></li><li><a href="lessons.html?lesson=lhook">Хук передньою</a></li><li><span>Хук задньої</span></li><li><span>Бекфіст</span></li><li><span>Апперкот</span></li></ul></div>
+      <div class="mod rv" style="--d:.16s"><div class="k">02</div><h3>Комбінації</h3><ul><li><a href="lessons.html?lesson=c12">Раз-два</a></li><li><a href="lessons.html?lesson=c123">Раз-два-три</a></li><li><a href="lessons.html?lesson=combo">Джеб → хук → прямий</a></li></ul></div>
+      <div class="mod rv" style="--d:.24s"><div class="k">03</div><h3>Скоро</h3><ul><li><span>Удари ногами</span></li><li><span>Перевірка свого відео</span></li><li><span>Твій персонаж</span></li></ul></div>
+    </div>
+  </div>
+</section>
+
+<div class="cta">
+  <div class="wrap">
+    <div class="eyebrow rv">Перший урок — стійка, 2 хвилини</div>
+    <h2 class="rv" style="--d:.08s">Готовий<br>до <em>залу</em>?</h2>
+    <a class="btn pri rv" style="--d:.16s" href="lessons.html">Увійти в зал <span class="arr">→</span></a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <a class="logo" href="#top"><i></i>JKD <span>· Віртуальний зал</span></a>
+  <div>Навчальний макет. Аналіз відео — демонстраційний. Кути й час рухів 3D-тренера приблизні.</div>
+</div></footer>
+
+<script>
+// ---- правша / лівша: запам'ятовуємо для уроків і одразу дзеркалимо 3D на головній ----
+function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+const heroFrame = document.getElementById("hero3d");
+function setHand(h) {
+  safeSet("jkdHand", h);
+  document.querySelectorAll("[data-hand]").forEach(b => b.classList.toggle("on", b.dataset.hand === h));
+  try { heroFrame.contentWindow.setMirror(h === "left"); } catch (e) {}
+}
+document.querySelectorAll("[data-hand]").forEach(b => b.onclick = () => setHand(b.dataset.hand));
+setHand(safeGet("jkdHand") || "right");
+heroFrame.onload = () => setHand(safeGet("jkdHand") || "right");
+
+// ---- шапка стає непрозорою після прокрутки ----
+const hdr = document.getElementById("top");
+const onScroll = () => hdr.classList.toggle("solid", scrollY > 30);
+addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+// ---- стрічка ----
+const words = ["Простота", "Прямота", "Свобода", "Рука раніше за ногу", "Будь як вода", "Що не так · чому · що робити"];
+document.getElementById("band").innerHTML = [...words, ...words].map(w => `<span>${w}</span>`).join("");
+
+// ---- цитата: слова проявляються по черзі ----
+const q = document.getElementById("qtext");
+q.innerHTML = q.textContent.split(" ").map((w, i) => `<span class="w${/вода/.test(w) ? " water" : ""}" style="--i:${i}">${w}</span>`).join(" ");
+
+// ---- поява при прокрутці ----
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .15 });
+document.querySelectorAll(".rv, #quote").forEach(el => io.observe(el));
+
+</script>
+</body>
+</html>
