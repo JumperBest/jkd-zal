@@ -101,7 +101,7 @@ const CHIN = onHead(-0.85, -0.5, 0);                            // підбор�
 const JAW = onHead(-0.5, -0.45, 0.74);                          // лівий бік щелепи суперника — ціль хука
 const SERIES = ["c12", "c123", "ckp", "cpk", "ckc"];                 // топ-5 комбінацій з книг (Arsenal 161–188)
 const QS = new URLSearchParams(location.search);
-const LESSON = ["hookkick", ...SERIES].includes(QS.get("lesson")) ? QS.get("lesson") : "combo";
+const LESSON = ["hookkick", "steps", ...SERIES].includes(QS.get("lesson")) ? QS.get("lesson") : "combo";
 if (QS.has("embed")) document.body.classList.add("embed");
 if (QS.has("hero")) document.body.classList.add("hero");
 // лівша (передня — ліва рука й нога): дзеркалимо картинку
@@ -352,6 +352,71 @@ function buildSeries(name) {
   }
   add(t + 0.2);
   add(t + 0.45);
+  return ks;
+}
+
+// ---------- кроки в стійці: тільки ноги, руки весь час on guard (Arsenal, гл. 3) ----------
+// Кроки маленькі (10–12 см); після кожного руху — коротка пауза в стійці. Сума кроків = 0, тож анімація йде по колу.
+// STEP_PARTS — початок / кінець кожного руху (для уроку на сайті).
+const STEP_PARTS = [];
+function buildStepsKeys() {
+  const ks = [], b = stance(-0.40);
+  const add = (t, o) => ks.push(K(b, t, o));
+  // таз (px, pz); передня стопа — база fx, fz; задня — rx, rz (у координатах таза стійки)
+  const k = (px, pz, [fx, fz, fo = {}], [rx, rz, ro = {}], o = {}) =>
+    ({ px, pz, ...o, ff: { x: fx + 0.32, z: fz + 0.06, ...fo }, rf: { x: rx - 0.30, z: rz - 0.14, ...ro } });
+  const still = (X, Z, o = {}) => k(X, Z, [X, Z], [X, Z], o);
+  const X = -0.40, PAUSE = 0.08;
+  let t = 0;
+  const part = (name, len, fn) => { fn(t); STEP_PARTS.push({ name, from: +t.toFixed(3), to: +(t + len).toFixed(3) }); t += len + PAUSE; };
+
+  add(0, still(X, 0, { say: "Стійка on guard: руки в захисті весь час, ноги трохи ширші за плечі. Arsenal 33–35" }));
+  t = 0.12;
+  part("step and slide вперед", 0.13, s => {
+    add(s, still(X, 0));
+    add(s + 0.04, k(X + 0.05, 0, [X + 0.06, 0, { lift: 0.03, pitch: 12 }], [X, 0], { say: "Step and slide вперед: передня нога перша, ставимо на п'яту… Arsenal 43" }));
+    add(s + 0.07, k(X + 0.08, 0, [X + 0.10, 0], [X, 0, { heel: 35 }]));
+    add(s + 0.11, k(X + 0.10, 0, [X + 0.10, 0], [X + 0.10, 0, { lift: 0.012 }], { say: "…задня підтягується на ту саму відстань — стійка не змінилась. Arsenal 43" }));
+    add(s + 0.13, still(X + 0.10, 0));
+  });
+  part("reverse step and slide назад", 0.13, s => {
+    add(s, still(X + 0.10, 0));
+    add(s + 0.04, k(X + 0.06, 0, [X + 0.10, 0], [X + 0.04, 0, { lift: 0.03 }], { say: "Назад: задня нога перша, ледь над підлогою… Arsenal 44" }));
+    add(s + 0.07, k(X + 0.03, 0, [X + 0.10, 0, { heel: 10 }], [X, 0]));
+    add(s + 0.11, k(X, 0, [X, 0, { lift: 0.012 }], [X, 0], { say: "…передня за нею на ту саму відстань. Arsenal 44" }));
+    add(s + 0.13, still(X, 0));
+  });
+  part("push step вперед", 0.10, s => {
+    add(s, still(X, 0));
+    add(s + 0.03, k(X + 0.02, 0, [X + 0.02, 0, { lift: 0.015 }], [X, 0, { heel: 45 }], { py: 0.92, say: "Push step: поштовх подушечкою задньої ноги — швидше, але низько, «це не стрибок». Arsenal 44" }));
+    add(s + 0.06, k(X + 0.08, 0, [X + 0.10, 0, { lift: 0.012 }], [X + 0.02, 0, { heel: 40, lift: 0.01 }]));
+    add(s + 0.08, k(X + 0.11, 0, [X + 0.12, 0], [X + 0.08, 0, { lift: 0.015 }]));
+    add(s + 0.10, still(X + 0.12, 0));
+  });
+  part("push step назад", 0.10, s => {
+    add(s, still(X + 0.12, 0));
+    add(s + 0.03, k(X + 0.10, 0, [X + 0.12, 0, { heel: 15 }], [X + 0.10, 0, { lift: 0.015 }], { py: 0.92, say: "Швидкий відхід: поштовх передньою ногою назад, задня летить першою. Arsenal 45" }));
+    add(s + 0.06, k(X + 0.04, 0, [X + 0.10, 0, { lift: 0.01 }], [X + 0.02, 0, { lift: 0.012 }]));
+    add(s + 0.08, k(X + 0.01, 0, [X + 0.04, 0, { lift: 0.015 }], [X, 0]));
+    add(s + 0.10, still(X, 0));
+  });
+  part("sidestep вправо", 0.13, s => {
+    add(s, still(X, 0));
+    add(s + 0.04, k(X, 0.04, [X, 0.10, { lift: 0.03 }], [X, 0], { say: "Крок управо: права (передня) нога перша… Arsenal 46" }));
+    add(s + 0.07, k(X, 0.07, [X, 0.10], [X, 0, { heel: 30 }]));
+    add(s + 0.11, k(X, 0.10, [X, 0.10], [X, 0.10, { lift: 0.012 }], { say: "…ліва підтягується на ту саму відстань, ноги не схрещуються. Arsenal 46" }));
+    add(s + 0.13, still(X, 0.10));
+  });
+  part("sidestep вліво", 0.13, s => {
+    add(s, still(X, 0.10));
+    add(s + 0.04, k(X, 0.06, [X, 0.10], [X, 0, { lift: 0.03 }], { say: "Крок уліво: ліва (задня) нога перша… Arsenal 46" }));
+    add(s + 0.07, k(X, 0.03, [X, 0.10, { heel: 10 }], [X, 0]));
+    add(s + 0.11, k(X, 0, [X, 0, { lift: 0.012 }], [X, 0], { say: "…права за нею. Arsenal 46" }));
+    add(s + 0.13, still(X, 0));
+  });
+  t -= PAUSE;
+  part("повернення в стійку", 0.12, s => add(s + 0.12, still(X, 0, { say: "Знову вихідна стійка — і все спочатку. Мета кроків — завжди повертатися в on guard. Arsenal 41" })));
+  add(t, still(X, 0));
   return ks;
 }
 
@@ -1014,7 +1079,7 @@ document.querySelectorAll("[data-zone]").forEach(b => b.onclick = () => setZone(
 setZone(new URLSearchParams(location.search).get("zone") || "gym");
 
 // ---------- стан і UI ----------
-const keys = LESSON === "hookkick" ? buildKickKeys() : SERIES.includes(LESSON) ? buildSeries(LESSON) : buildKeys(), vecs = keys.map(keyVec), END = keys[keys.length - 1].t;
+const keys = LESSON === "hookkick" ? buildKickKeys() : LESSON === "steps" ? buildStepsKeys() : SERIES.includes(LESSON) ? buildSeries(LESSON) : buildKeys(), vecs = keys.map(keyVec), END = keys[keys.length - 1].t;
 let T = 0, playing = true, loop = true, prevK = null, hitShow = 0, hitTag = "", hitAt = V(0, 0, 0);
 const $ = id => document.getElementById(id);
 $("steps").innerHTML = keys.filter(k => k.say).map(k => `<li data-t="${k.t}">${k.say}</li>`).join("");
