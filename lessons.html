@@ -57,7 +57,7 @@
   #home { padding:20px clamp(16px, 2.4vw, 28px) 40px; }
   .welcome { position:relative; border-radius:22px; overflow:hidden; padding:clamp(22px, 3.4vw, 40px); border:1px solid var(--line); isolation:isolate; min-height:260px;
     display:flex; flex-direction:column; justify-content:center;
-    background:linear-gradient(90deg, var(--bg2) 0%, rgba(16,20,27,.88) 38%, rgba(16,20,27,.15) 72%, transparent), url(img/welcome.jpg) 75% 40% / cover no-repeat, var(--bg2); }
+    background:linear-gradient(90deg, var(--bg2) 0%, var(--bg2) 42%, rgba(16,20,27,.75) 58%, rgba(16,20,27,.1) 80%, transparent), url(img/welcome.jpg) right 18% / auto 112% no-repeat, var(--bg2); }
   .welcome > * { max-width:520px; }
   .welcome h1 { font-size:clamp(28px, 3.6vw, 48px); font-weight:900; text-transform:uppercase; letter-spacing:-.045em; margin:10px 0 8px; }
   .welcome h1 em { font-style:normal; color:var(--water2); }
@@ -112,7 +112,11 @@
   .stagecol { min-width:0; min-height:0; display:flex; flex-direction:column; background:var(--stage); }
   .tools { display:flex; gap:6px; align-items:center; flex-wrap:wrap; padding:8px 10px; border-bottom:1px solid var(--line); }
   .tools .sp { flex:1; }
-  .tools .seg button, .transport .seg button { padding:6px 10px; font-size:12px; }
+  .tools2 { padding-top:0; border-bottom:1px solid var(--line); margin-top:-1px; }
+  .tools2 .seg { overflow-x:auto; max-width:100%; scrollbar-width:none; }
+  .tools2 .seg::-webkit-scrollbar { display:none; }
+  .tools .seg button { padding:6px 10px; font-size:12px; }
+  .transport .seg button { padding:9px 13px; font-size:13px; }
   .tbtn { height:30px; min-width:30px; padding:0 10px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--muted); font:600 12px/1 var(--body); cursor:pointer;
     display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all .2s; }
   .tbtn:hover:not(:disabled) { color:var(--text); border-color:var(--line2); }
@@ -126,22 +130,22 @@
   #cap span { background:rgba(11,14,19,.86); backdrop-filter:blur(8px); border:1px solid var(--line); border-radius:12px; padding:8px 14px; font-size:13.5px; max-width:640px; text-align:center; }
   #cap span:empty { display:none; }
   #cap b { color:var(--acc); }
-  .transport { display:flex; align-items:center; gap:10px; padding:10px 12px; border-top:1px solid var(--line); background:var(--bg2); }
-  .play { width:40px; height:40px; flex:none; border-radius:50%; border:0; background:var(--acc); color:var(--acc-ink); cursor:pointer; font-size:15px; display:grid; place-items:center;
+  .transport { display:flex; align-items:center; gap:14px; padding:12px 16px; border-top:1px solid var(--line); background:var(--bg2); }
+  .play { width:50px; height:50px; flex:none; border-radius:50%; border:0; background:var(--acc); color:var(--acc-ink); cursor:pointer; font-size:18px; display:grid; place-items:center;
     box-shadow:0 8px 20px -8px rgba(255,200,61,.6); transition:transform .2s; }
   .play:hover { transform:scale(1.06); }
   .play:disabled { opacity:.35; cursor:default; transform:none; }
-  .scrub { flex:1; position:relative; height:26px; display:flex; align-items:center; min-width:80px; }
-  .scrub input { width:100%; margin:0; -webkit-appearance:none; appearance:none; background:transparent; height:26px; cursor:pointer; position:relative; z-index:2; }
-  .scrub input::-webkit-slider-runnable-track { height:6px; border-radius:3px; background:transparent; }
-  .scrub input::-moz-range-track { height:6px; border-radius:3px; background:transparent; }
-  .scrub input::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; margin-top:-5px; border-radius:50%; background:#fff; border:3px solid var(--acc); box-shadow:0 2px 8px rgba(0,0,0,.5); }
-  .scrub input::-moz-range-thumb { width:12px; height:12px; border-radius:50%; background:#fff; border:3px solid var(--acc); }
-  .scrub .rail { position:absolute; left:0; right:0; height:6px; border-radius:3px; background:var(--line); overflow:hidden; }
+  .scrub { flex:1; position:relative; height:44px; display:flex; align-items:center; min-width:80px; }
+  .scrub input { width:100%; margin:0; -webkit-appearance:none; appearance:none; background:transparent; height:44px; cursor:pointer; position:relative; z-index:2; touch-action:none; }
+  .scrub input::-webkit-slider-runnable-track { height:12px; border-radius:6px; background:transparent; }
+  .scrub input::-moz-range-track { height:12px; border-radius:6px; background:transparent; }
+  .scrub input::-webkit-slider-thumb { -webkit-appearance:none; width:26px; height:26px; margin-top:-7px; border-radius:50%; background:#fff; border:3px solid var(--acc); box-shadow:0 2px 8px rgba(0,0,0,.5); }
+  .scrub input::-moz-range-thumb { width:20px; height:20px; border-radius:50%; background:#fff; border:3px solid var(--acc); }
+  .scrub .rail { position:absolute; left:0; right:0; height:12px; border-radius:6px; background:var(--line); overflow:hidden; }
   .scrub .rail i { display:block; height:100%; width:0; background:linear-gradient(90deg, var(--water), var(--acc)); }
-  .scrub .mk { position:absolute; top:3px; width:2px; height:20px; margin-left:-1px; background:var(--line2); z-index:1; border-radius:1px; }
+  .scrub .mk { position:absolute; top:6px; width:3px; height:32px; margin-left:-1.5px; background:var(--line2); z-index:1; border-radius:1px; }
   .scrub .mk.on { background:var(--acc); }
-  .tm { font:600 12px/1 var(--body); color:var(--dim); min-width:58px; text-align:right; font-variant-numeric:tabular-nums; }
+  .tm { font:600 13px/1 var(--body); color:var(--dim); min-width:58px; text-align:right; font-variant-numeric:tabular-nums; }
 
   /* --- адаптив --- */
   @media (max-width: 1200px) {
@@ -171,8 +175,9 @@
     .iconbtn { width:34px; height:34px; }
     .tools { gap:4px; padding:6px 8px; }
     .tools .seg button { padding:6px 8px; font-size:11.5px; }
-    .transport { gap:8px; padding:8px 10px; }
-    .transport .seg button { padding:6px 7px; font-size:11.5px; }
+    .transport { gap:10px; padding:10px 10px; }
+    .transport .seg button { padding:8px 8px; font-size:12px; }
+    .play { width:44px; height:44px; }
     #view { height:min(46vh, 86vw); }
   }
 </style>
@@ -213,6 +218,14 @@
           <span class="sp"></span>
           <button class="tbtn on" id="kiaiBtn" title="Крик тренера в момент удару">Кіай</button>
           <button class="tbtn" id="loopBtn" title="Повторювати по колу">⟲ Коло</button>
+        </div>
+        <div class="tools tools2">
+          <div class="seg" id="zoneBtns" role="group" aria-label="Локація">
+            <button data-zone="gym" class="on">Зал</button><button data-zone="alley">Провулок</button><button data-zone="dojo">Додзьо</button>
+          </div>
+          <div class="seg" id="camBtns" role="group" aria-label="Камера">
+            <button data-cam="side" class="on">Збоку</button><button data-cam="front">Спереду</button><button data-cam="back">Ззаду</button><button data-cam="top">Згори</button><button data-cam="fist">Кулак</button><button data-cam="opp">Очима суперника</button>
+          </div>
         </div>
         <div id="view"><div id="cap"><span id="capText"></span></div></div>
         <div class="transport">
@@ -466,8 +479,8 @@ function toStage() { if (innerWidth <= 820) $("stagecol").scrollIntoView({ behav
 
 // ===================== ПЛЕЄР: керуємо 3D-тренером через його #time / #play / #spd =====================
 const player = (() => {
-  let iframe = null, model = null, L = null, raf = 0, loop = true, speed = 0.3, holdUntil = 0, pending = null, lastT = 0;
-  const ui = { tg: "opp", kiai: true, left: safeGet("jkdHand") === "left" };
+  let iframe = null, model = null, L = null, raf = 0, loop = true, speed = 0.3, pending = null, lastT = 0;
+  const ui = { tg: "opp", kiai: true, left: safeGet("jkdHand") === "left", zone: safeGet("jkdZone") || "gym", cam: "side" };
   const doc = () => { try { return iframe && iframe.contentDocument; } catch (e) { return null; } };
   const el = id => { const d = doc(); return d && d.getElementById(id); };
   const isPlaying = () => { const p = el("play"); return !!p && p.textContent.includes("⏸"); };
@@ -480,21 +493,21 @@ const player = (() => {
     const w = iframe.contentWindow;
     if (w.setKiai) w.setKiai(ui.kiai);
     if (w.setMirror) w.setMirror(ui.left);
+    if (w.setZone) w.setZone(ui.zone);
   }
+  function camera() { const d = doc(), c = d && d.querySelector(`[data-cam="${ui.cam}"]`); if (c) c.click(); }
   function tick(now) {
     raf = requestAnimationFrame(tick);
     const tm = el("time"); if (!tm || !L) return;
     const t = +tm.value, span = L.to - L.from || 1;
-    if (isPlaying() && t >= L.to - 0.002) {               // кінець шматка: коротка пауза і знову з початку
-      play(false); setT(L.to);
-      if (loop) holdUntil = now + 700;
+    if (isPlaying() && t >= L.to - 0.002) {               // кінець шматка: одразу знову з початку, як гіфка
+      if (loop) { setT(L.from); play(true); } else { play(false); setT(L.to); }
     }
-    if (holdUntil && now >= holdUntil) { holdUntil = 0; setT(L.from); play(true); }
     if (t !== lastT) { lastT = t; $("scrub").value = t; $("railFill").style.width = Math.max(0, Math.min(100, (t - L.from) / span * 100)) + "%"; $("tm").textContent = `${(t - L.from).toFixed(2)} / ${span.toFixed(2)}`; }
-    $("playBtn").textContent = isPlaying() || holdUntil ? "❚❚" : "▶";
+    $("playBtn").textContent = isPlaying() ? "❚❚" : "▶";
   }
   function load(lesson) {
-    L = lesson; holdUntil = 0;
+    L = lesson;
     const sc = $("scrub"); sc.min = L.from; sc.max = L.to; sc.value = L.from;
     const span = L.to - L.from || 1;
     $("marks").innerHTML = L.steps.map(s => `<span class="mk" style="left:${(s.t - L.from) / span * 100}%"></span>`).join("");
@@ -502,22 +515,22 @@ const player = (() => {
       model = L.model;
       const v = $("view"); v.querySelectorAll("iframe").forEach(f => f.remove());
       iframe = document.createElement("iframe"); iframe.title = "3D-тренер";
-      iframe.src = `trainer3d.html?lesson=${L.model}&embed=1&hero=1${ui.left ? "&hand=left" : ""}`;
-      iframe.onload = () => { apply(); setT(pending != null ? pending : L.from); if (pending == null) play(true); pending = null; };
+      iframe.src = `trainer3d.html?lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
+      iframe.onload = () => { apply(); camera(); setT(pending != null ? pending : L.from); if (pending == null) play(true); pending = null; };
       v.prepend(iframe);
     } else { setT(L.from); play(true); }
     cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
   }
   return {
-    load, apply, ui,
+    load, apply, camera, ui,
     stop() { cancelAnimationFrame(raf); play(false); },
-    seek(t) { holdUntil = 0; if (!el("time")) { pending = t; return; } play(false); setT(t); },
+    seek(t) { if (!el("time")) { pending = t; return; } play(false); setT(t); },
     toggle() {
-      if (isPlaying() || holdUntil) { holdUntil = 0; play(false); return; }
+      if (isPlaying()) { play(false); return; }
       const tm = el("time"); if (tm && (+tm.value >= L.to - 0.01 || +tm.value < L.from)) setT(L.from);
       state.step = -1; markSteps(); caption(""); play(true);
     },
-    scrub(t) { holdUntil = 0; play(false); setT(t); },
+    scrub(t) { play(false); setT(t); },
     speed(s) { speed = s; apply(); },
     loop(on) { loop = on; },
   };
@@ -529,6 +542,14 @@ document.querySelectorAll("#spdBtns button").forEach(b => b.onclick = () => {
 });
 document.querySelectorAll("#tgBtns button").forEach(b => b.onclick = () => {
   player.ui.tg = b.dataset.tg; document.querySelectorAll("#tgBtns button").forEach(x => x.classList.toggle("on", x === b)); player.apply();
+});
+document.querySelectorAll("#zoneBtns button").forEach(b => b.onclick = () => {
+  player.ui.zone = b.dataset.zone; safeSet("jkdZone", b.dataset.zone);
+  document.querySelectorAll("#zoneBtns button").forEach(x => x.classList.toggle("on", x === b)); player.apply();
+});
+document.querySelectorAll("#zoneBtns button").forEach(x => x.classList.toggle("on", x.dataset.zone === player.ui.zone));
+document.querySelectorAll("#camBtns button").forEach(b => b.onclick = () => {
+  player.ui.cam = b.dataset.cam; document.querySelectorAll("#camBtns button").forEach(x => x.classList.toggle("on", x === b)); player.camera();
 });
 $("kiaiBtn").onclick = () => { player.ui.kiai = !player.ui.kiai; $("kiaiBtn").classList.toggle("on", player.ui.kiai); player.apply(); };
 $("loopBtn").classList.add("on");
