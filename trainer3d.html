@@ -469,6 +469,15 @@ function buildSeries(name) {
     add(t + 0.13, at(P, { hip: 50, chest: 54, rk: CH_R, lk: GUARD_L, opp: { L: OCH, R: OG.R } }));
     return t + 0.13;
   }
+  // пак сао проти удару: суперник сам б'є прямий передньою, ми зустрічаємо його руку задньою (Cheung/Wong 54, 92, 113)
+  function oppPunch(t, P) {
+    add(t + 0.04, at(P, { hip: 50, chest: 54, rk: GUARD_R, lk: GUARD_L, opp: { L: [0.30, 1.39, 0.08], R: OG.R },
+      say: "Суперник сам б'є прямий передньою рукою тобі в голову. Cheung/Wong 92, 113" }));
+    add(t + 0.09, at(P, { hip: 50, chest: 54, rk: GUARD_R, lk: GUARD_L, opp: { L: [0.18, 1.42, 0.06], R: OG.R },
+      say: "Його рука летить до тебе; ти стоїш у стійці, руки в захисті." }));
+    add(t + 0.13, at(P, { hip: 50, chest: 54, rk: GUARD_R, lk: openL([0.17, 1.38, 0.05]), opp: { L: OCH, R: OG.R } }));
+    return t + 0.13;
+  }
   // після удару: стійка, руки суперника назад, відхід
   function trapEnd(t, P) {
     add(t + 0.05, guard(P, { opp: OG, say: "Руки в стійку." }));
@@ -476,7 +485,7 @@ function buildSeries(name) {
   }
   function pak(t, P) {
     add(t + 0.03, at(P, { hip: 50, chest: 54, rk: CH_R, lk: openL([0.17, 1.37, 0.05]), opp: { L: OCH, R: OG.R },
-      say: "Задня рука, відкрита, іде до його передньої руки… Cheung/Wong 54" }));
+      say: "Задня рука, відкрита, зустрічає його руку… Cheung/Wong 54" }));
     add(t + 0.06, at(P, { ...pushFeet(P, 1), hip: 64, chest: 68, rk: { ...chin(-0.07), open: 0 }, lk: openL([0.26, 1.21, 0.17]), opp: { L: [0.28, 1.19, 0.19], R: OG.R },
       say: "Пак сао: задня рука шльопком притискає його руку, і в ту ж мить передня б'є. Шльопок і удар: майже один рух. Cheung/Wong 54, 102–103" }));
     add(t + 0.085, at(P, { ...pushFeet(P, 2), hip: 70, chest: 74, lean: 0.06, rk: chin(0), lk: openL([0.27, 1.19, 0.18]), opp: { L: [0.29, 1.18, 0.19], R: OG.R },
@@ -532,7 +541,7 @@ function buildSeries(name) {
   else add(0, guard(START, { say: "Стійка: передня рука розслаблена, лікоть біля боку, кулак на рівні плеча; задня біля підборіддя. Arsenal 33–34.", ...(TRAPS.includes(name) ? { opp: name === "jut" ? { L: [0.30, 1.30, 0.08], R: [0.32, 1.28, -0.10] } : OG } : {}) }));
   t = 0.18;
   if (name === "pak" || name === "lap" || name === "jao") {
-    t = crossHand(t, TRAP_P);
+    t = name === "pak" ? oppPunch(t, TRAP_P) : crossHand(t, TRAP_P);
     t = { pak, lap, jao }[name](t, TRAP_P);
   } else if (name === "jut") {
     t = jut(t, TRAP_P);
