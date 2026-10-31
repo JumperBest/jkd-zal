@@ -603,11 +603,71 @@ function setLimb(o, a, b, out) {
 function piece(g, geo, m, pos, sc = [1, 1, 1], rot = [0, 0, 0]) {
   const o = new THREE.Mesh(geo, m); o.position.set(...pos); o.scale.set(...sc); o.rotation.set(...rot); o.castShadow = true; g.add(o); return o;
 }
-let mouth = null;
+// ---------- обличчя: рисунок у стилі коміксу на «масці», що повторює форму голови ----------
+// Маска — сітка перед обличчям, кожна точка якої «лягає» на череп/щелепу (промінь спереду), +1,5 мм.
+// Рисунок — CanvasTexture: брови-штрихи, очі-мигдалини, ніс тінню, рот лінією; setMouth(0…1) відкриває рот (кіай).
+const FACE = { W: 0.11, H: 0.15, top: 0.065, cw: 256, ch: 352 };            // ширина (z), висота (y), верх маски; розмір канви
+let faceCv = null, faceTex = null, mouthNow = -1;
+const fx = z => (FACE.W / 2 - z) / FACE.W * FACE.cw, fy = y => (FACE.top - y) / FACE.H * FACE.ch;   // точка голови → канва
+function drawFace(open) {
+  const g = faceCv.getContext("2d"), INK = "#17110d", SHADE = "rgba(120,70,45,0.55)";
+  g.clearRect(0, 0, FACE.cw, FACE.ch); g.lineCap = "round"; g.lineJoin = "round";
+  [-1, 1].forEach(z => {
+    const ex = fx(0.034 * z), ey = fy(0.022), s = z > 0 ? -1 : 1;           // s — у який бік зовнішній кут ока
+    // брова: рівний штрих, що товщає до середини й трохи йде вгору назовні
+    g.fillStyle = INK; g.beginPath();
+    g.moveTo(ex - 26 * s, fy(0.040)); g.quadraticCurveTo(ex, fy(0.046), ex + 30 * s, fy(0.047));
+    g.quadraticCurveTo(ex + 2 * s, fy(0.040), ex - 26 * s, fy(0.036)); g.closePath(); g.fill();
+    // око: мигдалина з верхньою повікою-лінією і темною зіницею
+    g.fillStyle = "#f3eee6"; g.beginPath();
+    g.moveTo(ex - 24 * s, ey + 2); g.quadraticCurveTo(ex, ey - 14, ex + 25 * s, ey - 3); g.quadraticCurveTo(ex, ey + 11, ex - 24 * s, ey + 2); g.fill();
+    g.fillStyle = "#2a1a10"; g.beginPath(); g.arc(ex + 1 * s, ey - 1, 8, 0, 7); g.fill();
+    g.fillStyle = "#f3eee6"; g.beginPath(); g.arc(ex + 3 * s, ey - 4, 2, 0, 7); g.fill();          // відблиск
+    g.strokeStyle = INK; g.lineWidth = 3.6; g.beginPath(); g.moveTo(ex - 25 * s, ey + 2); g.quadraticCurveTo(ex, ey - 15, ex + 27 * s, ey - 4); g.stroke();
+  });
+  // ніс: тінь збоку і легкий низ — без об'ємних деталей
+  const nx = fx(0), ny = fy(-0.016);
+  g.strokeStyle = SHADE; g.lineWidth = 3; g.beginPath(); g.moveTo(nx - 6, fy(0.012)); g.quadraticCurveTo(nx - 10, ny - 8, nx - 7, ny); g.stroke();
+  g.lineWidth = 2.5; g.beginPath(); g.moveTo(nx - 12, ny + 2); g.quadraticCurveTo(nx, ny + 8, nx + 12, ny + 2); g.stroke();
+  // рот: закритий — рівна лінія; кіай — темний овал з лінією зубів
+  const mx = fx(0), my = fy(-0.05);
+  if (open < 0.08) {
+    g.strokeStyle = INK; g.lineWidth = 3; g.beginPath(); g.moveTo(mx - 20, my); g.quadraticCurveTo(mx, my + 3, mx + 20, my); g.stroke();
+    g.strokeStyle = SHADE; g.lineWidth = 2; g.beginPath(); g.moveTo(mx - 9, my + 10); g.lineTo(mx + 9, my + 10); g.stroke();
+  } else {
+    const h = 6 + 26 * open, w = 19 + 5 * open;
+    g.fillStyle = "#3a0d0d"; g.beginPath(); g.ellipse(mx, my + h / 2 - 3, w, h / 2 + 2, 0, 0, 7); g.fill();
+    g.fillStyle = "#f3eee6"; g.fillRect(mx - w * 0.7, my - 3, w * 1.4, Math.min(6, h * 0.25));
+    g.strokeStyle = INK; g.lineWidth = 2.5; g.beginPath(); g.ellipse(mx, my + h / 2 - 3, w, h / 2 + 2, 0, 0, 7); g.stroke();
+  }
+  faceTex.needsUpdate = true;
+}
+function paintFace(meshes) {
+  faceCv = document.createElement("canvas"); faceCv.width = FACE.cw; faceCv.height = FACE.ch;
+  faceTex = new THREE.CanvasTexture(faceCv);
+  const NX = 36, NY = 48, pos = [], uv = [], idx = [], ray = new THREE.Raycaster();
+  headG.updateMatrixWorld(true);
+  for (let j = 0; j <= NY; j++) for (let i = 0; i <= NX; i++) {
+    const u = i / NX, v = j / NY, z = FACE.W / 2 - u * FACE.W, y = FACE.top - v * FACE.H;   // u — зліва направо для глядача
+    ray.set(V(0.4, y, z), V(-1, 0, 0));
+    const hit = ray.intersectObjects(meshes)[0];
+    pos.push(hit ? hit.point.x + 0.0015 : 0, y, z); uv.push(u, 1 - v);
+  }
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+    const a = j * (NX + 1) + i, b = a + 1, c = a + NX + 1, d = c + 1;
+    idx.push(a, c, b, b, c, d);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  geo.setIndex(idx); geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: faceTex, transparent: true, depthWrite: false, roughness: 0.7,
+    side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 }));
+  headG.add(m); drawFace(0); mouthNow = 0;
+}
 function setMouth(o) {
-  const m = mouth; if (!m) return;
-  m.cav.scale.y = 0.1 + 0.75 * o; m.cav.position.y = -0.002 - 0.009 * o;
-  m.lo.position.y = -0.0045 - 0.017 * o; m.teeth.visible = o > 0.15; m.g.scale.z = 1 + 0.15 * o;
+  const q = Math.round(o * 10) / 10;                                        // перемальовуємо лише коли рот помітно змінився
+  if (!faceCv || q === mouthNow) return;
+  mouthNow = q; drawFace(q);
 }
 // корпус: локальні осі як у frame() — x уперед, y вгору, z вправо
 const torso = new THREE.Group(), abs = new THREE.Group(), hips = new THREE.Group(), headG = new THREE.Group();
@@ -636,35 +696,16 @@ const torso = new THREE.Group(), abs = new THREE.Group(), hips = new THREE.Group
   shell(abs, WAIST, 0.6, 0.22, 0); zip(abs, WAIST, 0.6, 0.22, 0);
   // таз
   shell(hips, [[-0.16, 0], [-0.15, 0.07], [-0.10, 0.13], [-0.03, 0.15], [0.06, 0.14], [0.10, 0.12], [0.13, 0]], 0.64, 0.06, -0.10);
-  // голова (стилізовано за рисами Брюса Лі): кутаста щелепа, вузькі мигдалеподібні очі з нависною повікою,
-  // густі прямі брови (зовнішні кінці трохи вгору), широкий ніс із низьким переніссям, повні губи
-  piece(headG, sph(0.1, 40, 28), M.skin, [0, 0.005, 0], [1.03, 1.12, 0.88]);
-  piece(headG, sph(0.07, 40, 28), M.skin, [0.03, -0.055, 0], [0.98, 0.8, 1.08]);           // щелепа
-  piece(headG, sph(0.03, 24, 16), M.skin, [0.072, -0.084, 0], [0.8, 0.75, 1.25]);          // підборіддя
-  piece(headG, sph(0.02, 16, 12), M.skin, [0.098, 0.002, 0], [0.35, 1.3, 0.45]);          // перенісся
-  piece(headG, sph(0.012, 16, 12), M.skin, [0.103, -0.016, 0], [1, 0.95, 1.1]);           // кінчик носа
+  // голова: гладка форма (череп, щелепа, підборіддя) — обличчя намальоване окремо (див. paintFace), без схожості з конкретною людиною
+  const skull = piece(headG, sph(0.1, 40, 28), M.skin, [0, 0.005, 0], [1.03, 1.12, 0.88]);
+  const jaw = piece(headG, sph(0.07, 40, 28), M.skin, [0.03, -0.055, 0], [0.98, 0.8, 1.08]);       // щелепа
+  const chinM = piece(headG, sph(0.03, 24, 16), M.skin, [0.072, -0.084, 0], [0.8, 0.75, 1.25]);   // підборіддя
   [-1, 1].forEach(z => {
-    piece(headG, sph(0.0095, 12, 8), M.skin, [0.096, -0.019, 0.012 * z]);                 // крила носа
-    piece(headG, sph(0.022, 18, 12), M.skin, [0.083, 0.036, 0.033 * z], [0.6, 0.45, 1.2]); // надбрівна дуга
-    piece(headG, sph(0.014, 16, 10), M.white, [0.094, 0.022, 0.034 * z], [0.35, 0.38, 1]); // око: вузьке, мигдалеподібне
-    piece(headG, sph(0.0062, 12, 8), M.iris, [0.098, 0.0215, 0.034 * z], [0.6, 0.85, 1]);  // темно-карий зір
-    piece(headG, sph(0.015, 16, 10), M.skinD, [0.095, 0.0268, 0.034 * z], [0.45, 0.32, 1.05]);   // нависна повіка
-    piece(headG, new THREE.BoxGeometry(0.004, 0.0025, 0.028), M.hair, [0.1, 0.0252, 0.034 * z]); // лінія вій
-    piece(headG, new THREE.BoxGeometry(0.01, 0.009, 0.038), M.hair, [0.094, 0.041, 0.036 * z], [1, 1, 1], [-0.18 * z, 0, 0]);   // брови
     piece(headG, sph(0.022, 10, 8), M.skinD, [-0.01, 0.0, 0.091 * z], [0.6, 1.15, 0.45]);  // вуха
     piece(headG, sph(0.03, 14, 10), M.hair, [0.03, -0.003, 0.086 * z], [0.32, 1, 0.22]);   // бакенбарди
     piece(headG, sph(0.04, 16, 12), M.hair, [-0.005, 0.03, 0.083 * z], [0.9, 0.7, 0.35]);  // волосся над вухами
   });
-  // рот: губи й темна порожнина; setMouth(0…1) відкриває його (кіай)
-  const mg = new THREE.Group(); mg.position.set(0.1015, -0.05, 0); headG.add(mg);
-  mouth = {
-    g: mg,
-    cav: piece(mg, sph(0.02, 16, 10), M.mouthIn, [-0.0005, -0.002, 0], [0.3, 0.1, 1.05]),
-    teeth: piece(mg, new THREE.BoxGeometry(0.004, 0.006, 0.026), M.white, [0.003, 0.0015, 0]),
-    up: piece(mg, sph(0.02, 16, 10), M.lip, [0.002, 0.005, 0], [0.3, 0.16, 1.12]),
-    lo: piece(mg, sph(0.02, 16, 10), M.lip, [0.002, -0.005, 0], [0.34, 0.22, 1.02]),
-  };
-  setMouth(0);
+  paintFace([skull, jaw, chinM]);
   // волосся: густе, темне, з об'ємом угорі й проділом зліва, зачесане набік
   piece(headG, new THREE.SphereGeometry(0.112, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.42), M.hair, [-0.006, 0.016, 0], [1.08, 1.2, 0.97], [0, 0, 0.22]);
   piece(headG, new THREE.SphereGeometry(0.108, 32, 12, -Math.PI / 2, Math.PI, Math.PI * 0.3, Math.PI * 0.36), M.hair, [-0.004, 0.0, 0], [1.06, 1.12, 0.96]);
