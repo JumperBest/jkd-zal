@@ -37,6 +37,15 @@
     font:700 13px/1.2 var(--body); cursor:pointer; margin-bottom:6px; transition:border-color .2s, background .2s; }
   #side .homelink:hover, #side .homelink.on { border-color:var(--acc); background:var(--acc-soft); }
   #side h4 { margin:16px 10px 6px; font:700 10.5px/1 var(--body); letter-spacing:.16em; text-transform:uppercase; color:var(--dim); display:flex; gap:8px; }
+  .fold { all:unset; box-sizing:border-box; cursor:pointer; width:100%; }
+  .fold:focus-visible { outline:2px solid var(--acc); outline-offset:2px; border-radius:6px; }
+  .fold .chev { margin-left:auto; font-size:16px; line-height:1; color:var(--acc); transition:transform .25s var(--ease, ease); font-style:normal; }
+  .fold[aria-expanded="false"] .chev { transform:rotate(-90deg); }
+  .grp { display:grid; grid-template-rows:1fr; transition:grid-template-rows .3s var(--ease, ease); }
+  .grp > div { overflow:hidden; min-height:0; }
+  .grp.shut { grid-template-rows:0fr; }
+  .modh.fold { cursor:pointer; }
+  .modh .cnt { margin-left:8px; font:600 12px/1 var(--body); color:var(--dim); }
   #side h4 span { color:var(--acc); }
   .li { display:flex; gap:10px; align-items:center; width:100%; text-align:left; padding:7px 10px; border-radius:10px; border:1px solid transparent; background:transparent; color:var(--text);
     font:600 13px/1.25 var(--body); cursor:pointer; transition:background .2s, border-color .2s; position:relative; }
@@ -464,14 +473,14 @@ const LESSONS = {
     drill: "На 0.1 — <b>10 разів</b>: присід — поштовх — удар. Потім <b>10</b> на швидкості 1, лікоть весь час біля тіла.",
   },
   upper: {
-    title: "Апперкот передньою", model: "upper", from: 0.15, to: 0.40,
+    title: "Апперкот передньою", model: "upper", from: 0.15, to: 0.41,
     goal: "Удар знизу вгору на близькій дистанції. Сила — з ніг і стегна: стегно ривком угору до цілі, рука лише «везе» кулак. «Ефективний апперкот — короткий». (Arsenal, гл. 8)",
     steps: [
       { t: 0.18,  text: "<b>Близька дистанція.</b> Часто після кросу, ухилу чи нирка." },
       { t: 0.23,  text: "<b>Присід.</b> Вага ~60 % на передній. Лікоть біля стегна, зігнутий на 45–90°, рука розслаблена." },
       { t: 0.255, text: "<b>Першим — стегно</b> ривком угору до цілі. Рука ще позаду, у плечі натяг. Рука ніколи не обганяє стегно." },
-      { t: 0.28,  text: "<b>Удар.</b> Ноги різко розгинаються — поштовх на місці вгору. Трохи на носки й ледь назад, вага переходить на задню ногу (~60 %)." },
-      { t: 0.30,  text: "<b>Крізь ціль на 10–15 см</b> — і зриваєш убік, як у хука." },
+      { t: 0.29,  text: "<b>Удар.</b> Ноги різко розгинаються — поштовх на місці вгору. Трохи на носки й ледь назад, вага переходить на задню ногу (~60 %)." },
+      { t: 0.31,  text: "<b>Крізь ціль на 10–15 см</b> — і зриваєш убік, як у хука." },
     ],
     mist: [
       { name: "Рука обганяє стегно", at: 0.255, what: "Кулак летить раніше, ніж рушило стегно.", why: "Удар тільки рукою — слабкий.", todo: "Спершу стегно вгору, рука — за ним." },
@@ -480,14 +489,14 @@ const LESSONS = {
     drill: "На 0.1 — <b>10 разів</b>, відчуй: стегно — ноги — рука. Потім <b>10</b> на швидкості 1.",
   },
   rupper: {
-    title: "Апперкот задньою", model: "rupper", from: 0.15, to: 0.40,
+    title: "Апперкот задньою", model: "rupper", from: 0.15, to: 0.41,
     goal: "Той самий апперкот, але задньою рукою: довший шлях — більше сили й більше місця для повороту. Вага навпаки: з задньої ноги на передню. Б'єш, коли дистанцію вже скорочено. (Arsenal 100)",
     steps: [
       { t: 0.18,  text: "<b>Дистанцію вже скорочено</b> — інакше задньою не дістати." },
       { t: 0.23,  text: "<b>Присід,</b> вага ~60 % на задній нозі. Лікоть біля стегна, зігнутий." },
       { t: 0.255, text: "<b>Ліве стегно рушає першим</b> угору й до цілі. Рука ще позаду." },
-      { t: 0.28,  text: "<b>Удар.</b> Ліве стегно на ціль, вага переходить на передню ногу (~60 %)." },
-      { t: 0.30,  text: "<b>Крізь ціль</b> — і зрив убік." },
+      { t: 0.29,  text: "<b>Удар.</b> Ліве стегно на ціль, вага переходить на передню ногу (~60 %)." },
+      { t: 0.31,  text: "<b>Крізь ціль</b> — і зрив убік." },
     ],
     mist: [
       { name: "Б'єш з далекої дистанції", at: 0.18, what: "Задній апперкот кидається, коли суперник ще далеко.", why: "Рука не дістає, а ти відкритий.", todo: "Спершу скороти дистанцію." },
@@ -561,36 +570,36 @@ const LESSONS = {
     drill: "З партнером, повільно — <b>10 разів</b>. Потім <b>10</b> у темпі, легко.",
   },
   c12: {
-    title: "Джеб → кросс", model: "c12", from: 0.15, to: 0.50,
+    title: "Джеб → кросс", model: "c12", from: 0.15, to: 0.506,
     goal: "Найшвидша двійка: джеб відкриває, кросс добиває. Кросс уже летить, поки джеб повертається.",
     steps: [
       { t: 0.18,  text: "<b>Джеб.</b> Рука першою, поштовх задньою ногою." },
       { t: 0.24,  text: "<b>Кулак джеба в цілі,</b> передня нога стає одразу після." },
-      { t: 0.267, text: "<b>Кросс стартує, поки джеб повертається</b> — один рух «туди-назад»." },
-      { t: 0.297, text: "<b>Кросс у цілі ще до того, як стала задня нога.</b> Передня рука вже біля підборіддя." },
-      { t: 0.357, text: "<b>Відновлення.</b> Ти в позиції для хука." },
-      { t: 0.457, text: "<b>Відхід</b> назад у безпечну дистанцію." },
+      { t: 0.261, text: "<b>Кросс стартує, поки джеб повертається</b> — один рух «туди-назад»." },
+      { t: 0.303, text: "<b>Кросс у цілі ще до того, як стала задня нога.</b> Передня рука вже біля підборіддя." },
+      { t: 0.363, text: "<b>Відновлення.</b> Ти в позиції для хука." },
+      { t: 0.463, text: "<b>Відхід</b> назад у безпечну дистанцію." },
     ],
     mist: [
-      { name: "Пауза між джебом і кросом", at: 0.267, what: "Джеб повністю повертається, і лише тоді йде кросс.", why: "Суперник встигає закритися після першого удару.", todo: "Тягни джеб назад — і цим самим рухом корпусу штовхай кросс." },
-      { name: "Кросс після того, як стала задня нога", at: 0.297, what: "Задня нога вже на підлозі, а кросс ще летить.", why: "Вага тіла пішла в підлогу, а не в удар.", todo: "Кросс у цілі — і тільки потім задня нога стає." },
+      { name: "Пауза між джебом і кросом", at: 0.261, what: "Джеб повністю повертається, і лише тоді йде кросс.", why: "Суперник встигає закритися після першого удару.", todo: "Тягни джеб назад — і цим самим рухом корпусу штовхай кросс." },
+      { name: "Кросс після того, як стала задня нога", at: 0.303, what: "Задня нога вже на підлозі, а кросс ще летить.", why: "Вага тіла пішла в підлогу, а не в удар.", todo: "Кросс у цілі — і тільки потім задня нога стає." },
     ],
     drill: "На 0.25 — <b>10 разів</b> «джеб → кросс» без пауз. Потім <b>10</b> на швидкості 1.",
   },
   c123: {
-    title: "Джеб → кросс → хук", model: "c123", from: 0.15, to: 0.78,
+    title: "Джеб → кросс → хук", model: "c123", from: 0.15, to: 0.806,
     goal: "Одна з найприродніших серій. Після кросу стійка відкрита — хук не лише б'є, а й повертає тебе в стійку JKD.",
     steps: [
       { t: 0.18,  text: "<b>Джеб.</b> Рука першою, поштовх задньою ногою." },
-      { t: 0.267, text: "<b>Кросс</b> без паузи після джеба." },
-      { t: 0.337, text: "<b>Після кросу стійка відкрита</b> — небезпечно, треба закрити." },
-      { t: 0.417, text: "<b>Хук передньою</b> з розворотом на стопах." },
-      { t: 0.637, text: "<b>Стійка закрита</b> — ти знову в стійці JKD." },
-      { t: 0.737, text: "<b>Відхід.</b>" },
+      { t: 0.261, text: "<b>Кросс</b> без паузи після джеба." },
+      { t: 0.363, text: "<b>Після кросу стійка відкрита</b> — небезпечно, треба закрити." },
+      { t: 0.443, text: "<b>Хук передньою</b> з розворотом на стопах." },
+      { t: 0.663, text: "<b>Стійка закрита</b> — ти знову в стійці JKD." },
+      { t: 0.763, text: "<b>Відхід.</b>" },
     ],
     mist: [
-      { name: "Хук не закриває стійку", at: 0.637, what: "Після хука передня стопа не розвернулась.", why: "Відкритий центр — найпростіше місце для контратаки.", todo: "Бий хук з розворотом передньої стопи й стегна." },
-      { name: "Пауза між ударами", at: 0.267, what: "Після кожного удару рука повністю повертається, і тільки потім наступний.", why: "Серія розпадається на три окремі удари.", todo: "Наступний удар починається, поки попередня рука повертається." },
+      { name: "Хук не закриває стійку", at: 0.663, what: "Після хука передня стопа не розвернулась.", why: "Відкритий центр — найпростіше місце для контратаки.", todo: "Бий хук з розворотом передньої стопи й стегна." },
+      { name: "Пауза між ударами", at: 0.261, what: "Після кожного удару рука повністю повертається, і тільки потім наступний.", why: "Серія розпадається на три окремі удари.", todo: "Наступний удар починається, поки попередня рука повертається." },
     ],
     drill: "На 0.25 — <b>10 серій</b>, слідкуй за стопами на хуку. Потім <b>10</b> на швидкості 1.",
   },
@@ -629,16 +638,34 @@ function toast(html) { const t = $("toast"); t.innerHTML = html; t.classList.add
 
 // ===================== ПРОГРАМА =====================
 const status = id => state.passed.has(id) ? "done" : ITEMS.find(i => i.id === id).open ? "open" : "lock";
+// Згорнуті категорії (запам'ятовуються в браузері)
+let folded = new Set();
+try { folded = new Set(JSON.parse(localStorage.getItem("jkdFold") || "[]")); } catch (e) {}
+function toggleFold(gi) {
+  folded.has(gi) ? folded.delete(gi) : folded.add(gi);
+  try { localStorage.setItem("jkdFold", JSON.stringify([...folded])); } catch (e) {}
+  document.querySelectorAll(`[data-fold="${gi}"]`).forEach(b => {
+    const shut = folded.has(gi) && !(b.closest("#side") && curGroup() === gi);
+    b.setAttribute("aria-expanded", !shut);
+    b.nextElementSibling.classList.toggle("shut", shut);
+  });
+}
+const curGroup = () => state.cur ? ITEMS.find(i => i.id === state.cur).gi : -1;
+const chev = `<i class="chev" aria-hidden="true">▾</i>`;
+function bindFold(root) { root.querySelectorAll("[data-fold]").forEach(b => b.onclick = () => toggleFold(+b.dataset.fold)); }
 const stIcon = s => `<span class="st ${s}">${s === "done" ? "✓" : s === "open" ? "▶" : ""}</span>`;
 function renderProgram() {
   let html = `<button class="homelink${state.cur ? "" : " on"}" data-go="">◎ Огляд залу</button>`;
   PROGRAM.forEach((g, gi) => {
-    html += `<h4><span>0${gi}</span>${g.mod}</h4>`;
+    const shut = folded.has(gi) && curGroup() !== gi;
+    html += `<button class="fold" data-fold="${gi}" aria-expanded="${!shut}"><h4><span>0${gi}</span>${g.mod}${chev}</h4></button><div class="grp${shut ? " shut" : ""}"><div>`;
     g.items.forEach(it => html += `<button class="li${it.open ? "" : " locked"}${state.cur === it.id ? " on" : ""}" data-go="${it.id}">${stIcon(status(it.id))}<span>${it.name}<small>${it.sub}</small></span></button>`);
+    html += `</div></div>`;
   });
   html += `<div class="soonbox"><b>Скоро</b>Удари ногами, перевірка свого відео, твій персонаж.</div>`;
   $("side").innerHTML = html;
   $("side").querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+  bindFold($("side"));
   const n = OPEN.filter(id => state.passed.has(id)).length;
   $("beltBar").style.width = (n / OPEN.length * 100) + "%"; $("beltTxt").textContent = `${n} / ${OPEN.length}`;
 }
@@ -659,19 +686,21 @@ function showHome() {
   $("lesson").hidden = true; $("home").hidden = false;
   const next = OPEN.find(id => !state.passed.has(id));
   let html = `<div class="welcome anim"><div class="eyebrow">Вітаю в залі</div><h1>Будь як <em>вода</em></h1>
-    <p>Дивись 3D-тренера, ставь паузу, крути повзунок і повторюй поруч. Почни зі стійки — далі удари руками й серії.</p>
+    <p>Дивись 3D-тренера, ставь паузу, крути повзунок і повторюй поруч. Почни зі стійки — далі кроки, удари руками, траппінг і серії. Швидкість ×1 — реальна, ×0.1 — найповільніше.</p>
     <div>${next ? `<button class="btn pri" data-go="${next}">${state.passed.size ? "Продовжити" : "Почати"}: ${LESSONS[next].title} <span class="arr">→</span></button>`
                 : `<span class="chip">Усі відкриті уроки пройдено ✓</span>`}</div></div>`;
   PROGRAM.forEach((g, gi) => {
-    html += `<div class="modh"><span>0${gi}</span><h2>${g.mod}</h2></div><div class="cards anim">`;
+    const shut = folded.has(gi);
+    html += `<button class="modh fold" data-fold="${gi}" aria-expanded="${!shut}"><span>0${gi}</span><h2>${g.mod}</h2><b class="cnt">${g.items.length}</b>${chev}</button><div class="grp${shut ? " shut" : ""}"><div><div class="cards anim">`;
     g.items.forEach((it, i) => {
       const s = status(it.id);
       html += `<button class="lc${it.open ? "" : " locked"}${s === "done" ? " done" : ""}" style="--i:${i}" data-go="${it.id}">${stIcon(s)}<h3>${it.name}</h3><p>${it.sub}</p></button>`;
     });
-    html += `</div>`;
+    html += `</div></div></div>`;
   });
   $("home").innerHTML = html;
   $("home").querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+  bindFold($("home"));
   document.querySelector("main").scrollTo({ top: 0 });
 }
 
@@ -722,6 +751,7 @@ function caption(html) { $("capText").innerHTML = html; }
 function toStage() { if (innerWidth <= 820) $("stagecol").scrollIntoView({ behavior: "smooth", block: "start" }); }
 
 // ===================== ПЛЕЄР: керуємо 3D-тренером через його #time / #play / #spd =====================
+const TEMPO = 0.5;   // як у trainer3d.html: 1 с часу моделі = 2 с реального часу на швидкості ×1
 const player = (() => {
   let iframe = null, model = null, L = null, R = null, Q = null, qi = 0, raf = 0, loop = true, speed = 0.25, pending = null, lastT = 0;
   const ui = { tg: "opp", kiai: true, left: safeGet("jkdHand") === "left", zone: safeGet("jkdZone") || "gym", cam: "side" };
@@ -756,7 +786,7 @@ const player = (() => {
     else if (isPlaying() && t >= R.to - 0.002) {               // кінець відрізка: одразу знову з початку, як гіфка
       if (loop) { setT(R.from); play(true); } else { play(false); setT(R.to); }
     }
-    if (t !== lastT) { lastT = t; $("scrub").value = t; $("railFill").style.width = Math.max(0, Math.min(100, (t - R.from) / span * 100)) + "%"; $("tm").textContent = `${(t - R.from).toFixed(2)} / ${span.toFixed(2)}`; }
+    if (t !== lastT) { lastT = t; $("scrub").value = t; $("railFill").style.width = Math.max(0, Math.min(100, (t - R.from) / span * 100)) + "%"; $("tm").textContent = `${((t - R.from) / TEMPO).toFixed(1)} / ${(span / TEMPO).toFixed(1)} с`; }
     $("playBtn").textContent = isPlaying() ? "❚❚" : "▶";
   }
   // відрізок, який крутимо: повзунок і мітки кроків — лише в його межах
