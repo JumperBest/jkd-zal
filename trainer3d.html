@@ -101,7 +101,7 @@ const CHIN = onHead(-0.85, -0.5, 0);                            // підбор�
 const JAW = onHead(-0.5, -0.45, 0.74);                          // лівий бік щелепи суперника — ціль хука
 const SERIES = ["c12", "c123", "ckp", "cpk", "ckc"];                 // топ-5 комбінацій з книг (Arsenal 161–188)
 const QS = new URLSearchParams(location.search);
-const LESSON = ["hookkick", "steps", ...SERIES].includes(QS.get("lesson")) ? QS.get("lesson") : "combo";
+const LESSON = ["hookkick", "steps", "guard", ...SERIES].includes(QS.get("lesson")) ? QS.get("lesson") : "combo";
 if (QS.has("embed")) document.body.classList.add("embed");
 if (QS.has("hero")) document.body.classList.add("hero");
 // лівша (передня — ліва рука й нога): дзеркалимо картинку
@@ -417,6 +417,49 @@ function buildStepsKeys() {
   t -= PAUSE;
   part("повернення в стійку", 0.12, s => add(s + 0.12, still(X, 0, { say: "Знову вихідна стійка — і все спочатку. Мета кроків — завжди повертатися в on guard. Arsenal 41" })));
   add(t, still(X, 0));
+  return ks;
+}
+
+// ---------- стійка: з простої стійки в on guard і назад (Arsenal, гл. 2, стор. 33–36) ----------
+// GUARD_PARTS — початок кожної фази (для уроку на сайті).
+const GUARD_PARTS = [];
+function buildGuardKeys() {
+  const ks = [], b = stance(-0.40);
+  const add = (t, o) => ks.push(K(b, t, o));
+  const X = -0.40, N = X - 0.15;                                           // N — де стоять ноги в простій стійці
+  const DOWN_R = { loc: [0.02, -0.53, 0.22], pole: [-0.4, 0, 0.3], roll: 0 }, DOWN_L = { loc: [0.02, -0.53, -0.22], pole: [-0.4, 0, -0.3], roll: 0 };
+  const plain = o => ({ px: N, py: 1.00, hip: 0, chest: 0, lean: 0, rk: DOWN_R, lk: DOWN_L,
+    ff: { x: N + 0.08, z: 0.15, yaw: 0, heel: 0, lift: 0 }, rf: { x: N + 0.08, z: -0.15, yaw: 0, heel: 0, lift: 0 }, ...o });
+  const phase = (t, name) => GUARD_PARTS.push({ name, t });
+
+  phase(0, "проста стійка");
+  add(0, plain({ say: "Проста стійка: ноги паралельно на ширині плечей, руки вздовж тіла, обличчям до суперника, розслаблено." }));
+  add(0.20, plain());
+  phase(0.20, "права нога вперед, корпус боком");
+  add(0.26, plain({ px: N + 0.04, hip: 15, chest: 15, rf: { x: N - 0.02, z: -0.14, yaw: 25, heel: 15, lift: 0.02 },
+    say: "Задня (ліва) нога відходить і розвертається на подушечці…" }));
+  add(0.31, plain({ px: X - 0.05, hip: 32, chest: 34, ff: { x: N + 0.24, z: 0.10, yaw: 12, heel: 0, lift: 0.03 }, rf: { x: X - 0.30, z: -0.14, yaw: 40, heel: 10, lift: 0 },
+    say: "…права (передня) нога — вперед, корпус розвертається боком. Arsenal 33" }));
+  add(0.36, plain({ px: X, hip: 45, chest: 50, lean: 0.02, ff: { x: X + 0.32, z: 0.06, yaw: 20, heel: 0, lift: 0 }, rf: { x: X - 0.30, z: -0.14, yaw: 40, heel: 5, lift: 0 },
+    say: "Передня стопа ~30° до лінії на ціль; лінія йде від носка передньої до середини задньої стопи. Arsenal 33–34" }));
+  phase(0.36, "коліна м'які, задня п'ята вгору");
+  add(0.46, plain({ px: X, py: 0.93, hip: 45, chest: 50, lean: 0.04, ff: { x: X + 0.32, z: 0.06, yaw: 20 },
+    rf: { x: X - 0.30, z: -0.14, yaw: 40, heel: 25, kp: [0.8, 0.1, -0.35] },
+    say: "Коліна м'яко зігнуті, задня п'ята трохи піднята, заднє коліно трохи всередину. Arsenal 34–35" }));
+  phase(0.46, "руки вгору");
+  add(0.52, { px: X, py: 0.93, hip: 45, chest: 50, lean: 0.04, rf: { kp: [0.8, 0.1, -0.35] },
+    rk: { loc: [0.20, -0.30, 0.20], pole: [0, -1, 0.5], roll: 0 }, lk: { loc: [0.10, -0.25, -0.05], pole: [0, -1, -0.6], roll: 0 } });
+  add(0.58, { rf: { kp: [0.8, 0.1, -0.35] },
+    say: "Руки: передня — лікоть біля боку, кулак на лінії цілі; задня — біля підборіддя. Переднє плече трохи вгору. Arsenal 35–36" });
+  phase(0.58, "стійка on guard (тримаємо)");
+  add(0.88, { rf: { kp: [0.8, 0.1, -0.35] }, say: "Тримаємо стійку: розслаблено, але готовий рушити в будь-який бік." });
+  phase(0.88, "назад у просту стійку");
+  add(0.95, { py: 0.95, rf: { kp: [0.8, 0.1, -0.35] }, rk: { loc: [0.10, -0.45, 0.22], pole: [-0.4, 0, 0.3], roll: 0 }, lk: { loc: [0.05, -0.45, -0.20], pole: [-0.4, 0, -0.3], roll: 0 },
+    say: "Руки вниз, ноги назад у просту стійку." });
+  add(1.02, plain({ px: X - 0.05, py: 0.98, hip: 30, chest: 30, ff: { x: N + 0.24, z: 0.10, yaw: 12, lift: 0.03 }, rf: { x: X - 0.30, z: -0.14, yaw: 40 } }));
+  add(1.10, plain({ px: N + 0.04, hip: 10, chest: 10, ff: { x: N + 0.08, z: 0.15, yaw: 0 }, rf: { x: N - 0.02, z: -0.14, yaw: 25, heel: 10, lift: 0.02 } }));
+  add(1.16, plain());
+  add(1.30, plain());
   return ks;
 }
 
@@ -1079,7 +1122,7 @@ document.querySelectorAll("[data-zone]").forEach(b => b.onclick = () => setZone(
 setZone(new URLSearchParams(location.search).get("zone") || "gym");
 
 // ---------- стан і UI ----------
-const keys = LESSON === "hookkick" ? buildKickKeys() : LESSON === "steps" ? buildStepsKeys() : SERIES.includes(LESSON) ? buildSeries(LESSON) : buildKeys(), vecs = keys.map(keyVec), END = keys[keys.length - 1].t;
+const keys = LESSON === "hookkick" ? buildKickKeys() : LESSON === "steps" ? buildStepsKeys() : LESSON === "guard" ? buildGuardKeys() : SERIES.includes(LESSON) ? buildSeries(LESSON) : buildKeys(), vecs = keys.map(keyVec), END = keys[keys.length - 1].t;
 let T = 0, playing = true, loop = true, prevK = null, hitShow = 0, hitTag = "", hitAt = V(0, 0, 0);
 const $ = id => document.getElementById(id);
 $("steps").innerHTML = keys.filter(k => k.say).map(k => `<li data-t="${k.t}">${k.say}</li>`).join("");
