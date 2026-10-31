@@ -114,7 +114,8 @@ setMirror(QS.get("hand") === "left");
 // rk / lk: куди дивляться КІСТОЧКИ правої (передньої) / лівої (задньої) руки:
 //   tgt [x,y,z] від свого плеча (осі світу), loc [вперед, вгору, вправо] від шиї в системі плечей, w, точка у світі.
 // pole: куди дивиться лікоть; roll, поворот кулака (0: вертикальний, великий палець угору).
-const GUARD_R = { tgt: [0.36, -0.04, -0.03], pole: [0, -1, 0.5], roll: 0 };
+// передня рука розслаблена: лікоть біля боку, кулак на рівні плеча, не витягнута (Arsenal 33, «ideal hand position»; витягнута рука, це рання помилка Fighting Method)
+const GUARD_R = { tgt: [0.28, -0.01, -0.03], pole: [0, -1, 0.5], roll: 0 };
 const GUARD_L = { loc: [0.22, 0.08, 0.05], pole: [0, -1, -0.6], roll: 0 };
 // Стопи стійки (Arsenal 33–34, Straight Lead 25–26): лінія на ціль іде повз носок передньої стопи й під серединою задньої;
 // передня стопа ~30° до лінії; задня п'ята піднята «приблизно на півдюйма» (≈1,5 см), не вище.
@@ -138,7 +139,7 @@ function buildKeys() {
   const ff = (dx, o = {}) => Object.assign({ x: F0 + dx, lift: 0 }, o);
   const rf = (dx, o = {}) => Object.assign({ x: R0 + dx, lift: 0 }, o);
   const chin = d => ({ w: [CHIN.x + d, CHIN.y, CHIN.z], pole: [0, -1, 0.4], roll: 0 });
-  add(0, { say: "Стійка: передня рука на лінії до цілі, задня біля підборіддя, задня п'ята піднята." });
+  add(0, { say: "Стійка: передня рука розслаблена, лікоть біля боку, кулак на рівні плеча; задня біля підборіддя; задня п'ята піднята. Arsenal 33–34." });
   add(0.25);
   // джеб з підшагом: рука → передня нога → задня нога (три точки приземлення)
   add(0.30, { hip: 52, chest: 56, rk: { tgt: [0.48, -0.03, -0.04], pole: [0, -1, 0.35], roll: 0 },
@@ -169,7 +170,7 @@ function buildKeys() {
     rk: { w: [CHIN.x - 0.16, 1.36, -0.18], pole: [0.3, 0, 1], roll: 0 },
     say: "«Зрив»: рука йде далі по дузі, ціль розвертається. Arsenal 97" });
   add(0.68, { px: P + 0.12, hip: 92, chest: 95, ff: ff(0.11, { heel: 20, yaw: 50 }), rf: rf(0.11, { heel: 6, yaw: 70 }),
-    rk: { loc: [0.24, -0.12, 0.04], pole: [0, -1, 0.5], roll: 0 },
+    rk: { tgt: [0.26, -0.04, -0.03], pole: [0, -1, 0.5], roll: 0 },
     say: "Рука закінчує біля корпусу." });
   // крок назад, щоб відновити дистанцію для прямого
   add(0.72, { px: P + 0.08, ff: ff(0.11), rf: rf(0.01, { lift: 0.025 }),
@@ -187,7 +188,7 @@ function buildKeys() {
     say: "Передня нога стала." });
   add(0.89, { px: P + 0.13, hip: 82, chest: 86, lean: 0.08, ff: ff(0.12), rf: rf(0.06, { heel: 35, lift: 0.02 }), rk: chin(0.10),
     say: "Крізь ціль, задня нога ковзає слідом." });
-  add(0.915, { px: P + 0.13, hip: 60, chest: 62, ff: ff(0.12), rf: rf(0.12), rk: { tgt: [0.34, -0.02, -0.03], pole: [0, -1, 0.5], roll: 0 },
+  add(0.915, { px: P + 0.13, hip: 60, chest: 62, ff: ff(0.12), rf: rf(0.12), rk: { tgt: [0.28, -0.01, -0.03], pole: [0, -1, 0.5], roll: 0 },
     say: "Задня нога стала, рука повертається тим самим шляхом, не опускається. Arsenal 75, 82" });
   // після атаки: швидкий відхід назад
   add(0.96, { px: P + 0.07, ff: ff(0.12), rf: rf(0.0, { lift: 0.03 }),
@@ -272,7 +273,7 @@ function buildSeries(name) {
     add(t + 0.08, at(P, { hip: 100, chest: 92, ff: { heel: 35, yaw: 62 }, rf: { heel: 0, yaw: 82 }, rk: { w: [JAW.x, JAW.y, JAW.z], pole: [0.4, 0.2, 1], roll: 0 }, tag: "хук · бік щелепи" }));
     add(t + 0.115, at(P, { px: P - 0.01, hip: 106, chest: 100, ff: { heel: 35, yaw: 64 }, rf: { heel: 0, yaw: 84 }, rk: { w: [JAW.x + 0.02, JAW.y, JAW.z - 0.09], pole: [0.4, 0.2, 1], roll: 0 } }));
     add(t + 0.17, at(P, { px: P - 0.01, hip: 108, chest: 108, ff: { heel: 30, yaw: 62 }, rf: { heel: 0, yaw: 82 }, rk: { w: [CHIN.x - 0.16, 1.36, -0.18], pole: [0.3, 0, 1], roll: 0 } }));
-    add(t + 0.23, at(P, { px: P - 0.01, hip: 92, chest: 95, ff: { heel: 20, yaw: 50 }, rf: { heel: 6, yaw: 70 }, rk: { loc: [0.24, -0.12, 0.04], pole: [0, -1, 0.5], roll: 0 } }));
+    add(t + 0.23, at(P, { px: P - 0.01, hip: 92, chest: 95, ff: { heel: 20, yaw: 50 }, rf: { heel: 6, yaw: 70 }, rk: { tgt: [0.26, -0.04, -0.03], pole: [0, -1, 0.5], roll: 0 } }));
     add(t + 0.30, guard(P, { say: "Хук закрив стійку: ти знову в стійці JKD. Arsenal 188" }));
     return t + 0.30;
   }
@@ -528,7 +529,7 @@ function buildSeries(name) {
   const TRAP_P = -0.22;
   const START = TRAPS.includes(name) ? TRAP_P : name === "rupper" ? CLOSE + 0.24 : name === "shovel" ? CLOSE + 0.15 : name === "upper" ? CLOSE + 0.18 : S;
   if (name === "cork") add(0, { ...guard(S + 0.02), pz: 0.17, ff: { x: S + 0.34, z: 0.17 + ST.fz }, rf: { x: S - 0.28, z: 0.17 + ST.rz }, say: "Стійка: суперник трохи ліворуч від тебе." });
-  else add(0, guard(START, { say: "Стійка: передня рука на лінії до цілі, задня біля підборіддя.", ...(TRAPS.includes(name) ? { opp: name === "jut" ? { L: [0.30, 1.30, 0.08], R: [0.32, 1.28, -0.10] } : OG } : {}) }));
+  else add(0, guard(START, { say: "Стійка: передня рука розслаблена, лікоть біля боку, кулак на рівні плеча; задня біля підборіддя. Arsenal 33–34.", ...(TRAPS.includes(name) ? { opp: name === "jut" ? { L: [0.30, 1.30, 0.08], R: [0.32, 1.28, -0.10] } : OG } : {}) }));
   t = 0.18;
   if (name === "pak" || name === "lap" || name === "jao") {
     t = crossHand(t, TRAP_P);
@@ -683,7 +684,7 @@ function buildStepsKeys(kind) {
       add(s + 0.18, still(P, 0, { hip: 50, chest: 54, rk: JAB0, say: "…ноги стали: і тільки тепер рука. Це удар «на цілий такт»: суперник встигає побачити й відповісти. Straight Lead 98" }));
       add(s + 0.215, still(P, 0, { px: P + 0.03, hip: 64, chest: 68, lean: 0.06, rk: chin(-0.04) }));
       add(s + 0.235, still(P, 0, { px: P + 0.04, hip: 68, chest: 72, lean: 0.07, rk: chin(0.02), tag: "джеб · крок, потім удар" }));
-      add(s + 0.27, still(P, 0, { px: P + 0.03, hip: 60, chest: 62, rk: { tgt: [0.34, -0.02, -0.03], pole: [0, -1, 0.5], roll: 0 } }));
+      add(s + 0.27, still(P, 0, { px: P + 0.03, hip: 60, chest: 62, rk: { tgt: [0.28, -0.01, -0.03], pole: [0, -1, 0.5], roll: 0 } }));
       back(s + 0.29, P, 0, 0.10, "Назад у вихідну точку.", null);
     });
     // 3. поштовх (push-off) з джебом, правильно: рука раніше за ногу, кулак у цілі до того, як стала передня нога
@@ -697,7 +698,7 @@ function buildStepsKeys(kind) {
         say: "Кулак у цілі раніше, ніж стала передня нога: вага тіла йде в ціль, а не в підлогу. Straight Lead 98" });
       add(s + 0.075, { px: X + 0.12, py: 0.94, hip: 74, chest: 78, lean: 0.07, ff: { x: F0 + 0.10 }, rf: { x: R0, heel: 42 }, rk: chin(0.06) });
       add(s + 0.09, { px: X + 0.11, hip: 70, chest: 74, ff: { x: F0 + 0.10 }, rf: { x: R0 + 0.05, heel: 35, lift: 0.02 }, rk: chin(0.08) });
-      add(s + 0.115, still(X + 0.10, 0, { hip: 60, chest: 62, rk: { tgt: [0.34, -0.02, -0.03], pole: [0, -1, 0.5], roll: 0 },
+      add(s + 0.115, still(X + 0.10, 0, { hip: 60, chest: 62, rk: { tgt: [0.28, -0.01, -0.03], pole: [0, -1, 0.5], roll: 0 },
         say: "Задня нога ковзнула слідом, стійка відновлена. Найшвидший удар: ноги й рука працюють разом, без паузи. Straight Lead 98–100" }));
       add(s + 0.14, still(X + 0.10, 0));
       quickBack(s + 0.20, X + 0.10, 0.10, "Після атаки: швидкий відхід назад. Arsenal 45");
@@ -1373,10 +1374,10 @@ function setTarget(name) {
   $("s-tgt").textContent = { opp: "Голова суперника: зсув / поворот", mitt: "Лапа: зсув / поворот", bag: "Груша: швидкість / оберт" }[name];
   headReset();
 }
-function headReset() { Object.values(TG).forEach(o => o.reset()); prevK = null; touching = { R: false, L: false, F: false }; }
+function headReset() { Object.values(TG).forEach(o => o.reset()); prevK = null; bodyKick = 0; bodyTouch = false; touching = { R: false, L: false, F: false }; }
 
 // ---------- відчуття удару: стоп-кадр, трус камери, спалах, звук ----------
-let hitStop = 0, shake = 0, peakF = 0, touching = { R: false, L: false, F: false }, sound = false, actx = null;   // звук вимкнено (рішення користувача 2026-10-30)
+let hitStop = 0, shake = 0, peakF = 0, bodyKick = 0, bodyTouch = false, touching = { R: false, L: false, F: false }, sound = false, actx = null;   // звук вимкнено (рішення користувача 2026-10-30)
 const flashes = [];
 function flashAt(p, power) {
   const m = new THREE.Mesh(new THREE.SphereGeometry(0.03, 16, 10), new THREE.MeshBasicMaterial({ color: 0xfff1b0, transparent: true, opacity: 0.9 }));
@@ -1641,7 +1642,7 @@ function pose(t, simDt) {
     }
   } else if (simDt > 0) tgt.step(simDt, null);
   prevK = { R: want.R.clone(), L: want.L.clone(), F: want.F.clone() };
-  tgt.draw(); drawOppArms(t);
+  tgt.draw(); if (tgt === TG.opp) opp.torso.position.x += 0.06 * bodyKick; drawOppArms(t);
   const rs = tgt.solid(s.rk), ls = tgt.solid(s.lk), fs = tgt.solid(instep);
   if (fs.depth > 0) {                                                       // стопа не проходить крізь ціль, зсуваємо всю стопу
     const d = fs.k.clone().sub(instep);
@@ -1665,6 +1666,15 @@ function pose(t, simDt) {
     }
     touching[side] = touch[side];
   }
+  // удар у корпус суперника (шовел-хук): кулак біля сонячного сплетіння, корпус ледь відхитується
+  const SOLAR = oPelvis.clone().addScaledVector(oNeck.clone().sub(oPelvis), 0.5).add(V(-0.09, 0, 0));
+  const bodyNear = tgt === TG.opp && [ra.knuckle, la.knuckle].some(p => p.distanceTo(SOLAR) < 0.10);
+  if (bodyNear && !bodyTouch && simDt > 0) {
+    const kn = ra.knuckle.distanceTo(SOLAR) < la.knuckle.distanceTo(SOLAR) ? ra.knuckle : la.knuckle;
+    hitStop = 0.06; shake = 0.2; flashAt(kn, 0.7); thump(0.7); bodyKick = 1;
+    hitShow = 0.7; hitTag = currentTag(t) || "удар в корпус"; hitAt = kn.clone();
+  }
+  bodyTouch = bodyNear; bodyKick *= Math.pow(0.02, Math.max(simDt, 0) / 0.5);
   const tagNow = currentTag(t);
   marks.chin.material.color.setHex(touch.R && /прям|джеб/.test(tagNow) ? 0xff4b2b : 0xffd23f);
   marks.jaw.material.color.setHex((touch.R || touch.F) && /хук/.test(tagNow) ? 0xff4b2b : 0xffd23f);
