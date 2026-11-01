@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;700;900&display=swap">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="site.css?v=cb7a1eed">
 <style>
   body { overflow-x:clip; }
   .wrap { max-width:1200px; margin:0 auto; padding:0 24px; }
@@ -25,7 +25,7 @@
 
   /* --- головний екран --- */
   .hero { position:relative; display:flex; align-items:center; min-height:min(92vh, 860px); padding:92px 0 48px; overflow:hidden; isolation:isolate; }
-  .hero .bg { position:absolute; inset:0; z-index:-2; background:url(img/hero.jpg) 72% center / cover no-repeat; animation:zoom 22s var(--ease) both; }
+  .hero .bg { position:absolute; inset:0; z-index:-2; background:url(img/hero.jpg?v=d4f385bd) 72% center / cover no-repeat; animation:zoom 22s var(--ease) both; }
   @keyframes zoom { from { transform:scale(1.08); } }
   .hero::before { content:""; position:absolute; inset:0; z-index:-1;
     background:linear-gradient(90deg, var(--bg) 0%, rgba(11,14,19,.85) 32%, rgba(11,14,19,.15) 62%, transparent 80%),
@@ -79,7 +79,7 @@
   /* цитата */
   .quote { padding:96px 24px; text-align:center; max-width:none; position:relative; isolation:isolate;
     background:radial-gradient(55% 48% at 50% 44%, rgba(7,9,13,.82), rgba(7,9,13,.45) 70%, transparent),
-      linear-gradient(180deg, var(--bg), rgba(11,14,19,.45) 30%, rgba(11,14,19,.45) 70%, var(--bg)), url(img/quote.jpg) center 22% / cover no-repeat; }
+      linear-gradient(180deg, var(--bg), rgba(11,14,19,.45) 30%, rgba(11,14,19,.45) 70%, var(--bg)), url(img/quote.jpg?v=a31aae3f) center 22% / cover no-repeat; }
   .quote blockquote { margin:0 auto; max-width:16em; text-shadow:0 2px 24px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.6); font:700 clamp(28px, 4.2vw, 56px)/1.06 var(--display); letter-spacing:-.035em; }
   .quote blockquote .w { display:inline-block; opacity:.15; transition:opacity .6s var(--ease), color .6s; transition-delay:calc(var(--i) * 90ms); }
   .quote.in blockquote .w { opacity:1; }
@@ -92,8 +92,10 @@
   .princ { display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; }
   .princ article { background:var(--bg); padding:0 0 24px; position:relative; transition:background .4s; overflow:hidden; }
   .princ article > :not(.ph) { margin-left:24px; margin-right:24px; }
-  .princ .ph { aspect-ratio:16 / 10; background:#0a0c10 center 30% / cover no-repeat; margin-bottom:-28px; transition:transform .8s var(--ease);
-    -webkit-mask:linear-gradient(180deg, #000 55%, transparent); mask:linear-gradient(180deg, #000 55%, transparent); }
+  /* квадратна картинка повністю по висоті (голова не обрізається), краї розчиняються в тлі */
+  .princ .ph { aspect-ratio:16 / 10; background:transparent center top / auto 100% no-repeat; margin-bottom:-28px; transition:transform .8s var(--ease);
+    --fade:linear-gradient(180deg, #000 55%, transparent), linear-gradient(90deg, transparent 19%, #000 31%, #000 69%, transparent 81%);
+    -webkit-mask:var(--fade); -webkit-mask-composite:source-in; mask:var(--fade); mask-composite:intersect; }
   .princ article:hover .ph { transform:scale(1.05); }
   .princ .num { position:relative; }
   .princ article:hover { background:var(--bg2); }
@@ -137,7 +139,7 @@
 
   /* заклик */
   .cta { text-align:center; padding:120px 0 130px; position:relative; overflow:hidden; isolation:isolate;
-    background:linear-gradient(180deg, var(--bg), rgba(11,14,19,.45) 35%, rgba(11,14,19,.55) 75%, var(--bg)), url(img/cta.jpg) center 40% / cover no-repeat; }
+    background:linear-gradient(180deg, var(--bg), rgba(11,14,19,.45) 35%, rgba(11,14,19,.55) 75%, var(--bg)), url(img/cta.jpg?v=b6d2c060) center 40% / cover no-repeat; }
   .cta h2 { text-shadow:0 6px 40px rgba(0,0,0,.6); }
   .cta::before { content:""; position:absolute; left:50%; top:50%; width:900px; height:900px; transform:translate(-50%, -50%); border-radius:50%;
     background:repeating-radial-gradient(circle, transparent 0 58px, rgba(63,162,255,.07) 58px 60px); animation:ripple 9s linear infinite; z-index:-1;
@@ -179,9 +181,9 @@
 </head>
 <body>
 <header id="top"><div class="wrap">
-  <a class="logo" href="index.html"><i></i>JKD <span>· Віртуальний зал</span></a>
+  <a class="logo" href="index.html?v=20b1875f"><i></i>JKD <span>· Віртуальний зал</span></a>
   <nav><a href="#how">Як це працює</a><a href="#program">Програма</a></nav>
-  <a class="btn sm pri" href="lessons.html">Увійти в зал</a>
+  <a class="btn sm pri" href="lessons.html?v=c08f323f">Увійти в зал</a>
 </div></header>
 
 <div class="hero">
@@ -192,8 +194,8 @@
       <h1 class="rv" style="--d:.08s">Будь<br>як <em>вода</em></h1>
       <p class="lead rv" style="--d:.16s"><b>3D-тренер</b> показує кожен удар по кроках. Став паузу, крути повзунок, сповільнюй, і повторюй поруч.</p>
       <div class="actions rv" style="--d:.24s">
-        <a class="btn pri" href="lessons.html">Почати навчання <span class="arr">→</span></a>
-        <a class="btn" href="lessons.html?lesson=c123">Спробувати: джеб → крос → хук</a>
+        <a class="btn pri" href="lessons.html?v=c08f323f">Почати навчання <span class="arr">→</span></a>
+        <a class="btn" href="lessons.html?v=c08f323f&lesson=c123">Спробувати: джеб → крос → хук</a>
       </div>
       <div class="hand rv" style="--d:.32s">Твоя стійка:
         <div class="seg" role="group" aria-label="Правша чи лівша"><button data-hand="right">Правша</button><button data-hand="left">Лівша</button></div>
@@ -222,9 +224,9 @@
       <p class="rv" style="--d:.16s">На них стоїть кожен урок, від стійки до серій ударів.</p>
     </div>
     <div class="princ">
-      <article class="rv"><div class="ph" style="background-image:url(img/princip_1.jpg)"></div><div class="num">01</div><h3>Простота</h3><p>Прибирай зайве. Найкращий рух: той, у якому немає нічого зайвого.</p></article>
-      <article class="rv" style="--d:.1s"><div class="ph" style="background-image:url(img/princip_2.jpg)"></div><div class="num">02</div><h3>Прямота</h3><p>Найкоротший шлях до цілі. Рука рушає раніше за ногу, завжди.</p></article>
-      <article class="rv" style="--d:.2s"><div class="ph" style="background-image:url(img/princip_3.jpg)"></div><div class="num">03</div><h3>Свобода</h3><p>Бери те, що працює для тебе, відкидай те, що ні. Без зайвих правил і форм.</p></article>
+      <article class="rv"><div class="ph" style="background-image:url(img/princip_1.jpg?v=c1a3a1d5)"></div><div class="num">01</div><h3>Простота</h3><p>Прибирай зайве. Найкращий рух: той, у якому немає нічого зайвого.</p></article>
+      <article class="rv" style="--d:.1s"><div class="ph" style="background-image:url(img/princip_2.jpg?v=ea215aa9)"></div><div class="num">02</div><h3>Прямота</h3><p>Найкоротший шлях до цілі. Рука рушає раніше за ногу, завжди.</p></article>
+      <article class="rv" style="--d:.2s"><div class="ph" style="background-image:url(img/princip_3.jpg?v=3c82c492)"></div><div class="num">03</div><h3>Свобода</h3><p>Бери те, що працює для тебе, відкидай те, що ні. Без зайвих правил і форм.</p></article>
     </div>
   </div>
 </section>
@@ -240,7 +242,7 @@
         <div class="kanji" aria-hidden="true">截拳道</div>
         <span class="corner tl"></span><span class="corner br"></span>
         <div class="stage">
-          <iframe id="hero3d" title="3D-тренер" src="trainer3d.html?lesson=c123&embed=1&hero=1"></iframe>
+          <iframe id="hero3d" title="3D-тренер" src="trainer3d.html?v=0805834b&lesson=c123&embed=1&hero=1"></iframe>
           <div class="lbl"><i></i>3D-тренер · джеб → крос → хук · крути мишкою</div>
         </div>
       </div>
@@ -261,10 +263,10 @@
       <p class="rv" style="--d:.16s">Поки що: кроки, удари руками, траппінг і серії. Усі уроки вже відкриті.</p>
     </div>
     <div class="prog">
-      <div class="mod rv"><div class="k">00</div><h3>Основи</h3><ul><li><a href="lessons.html?lesson=stance">Стійка: як у неї стати</a></li><li><a href="lessons.html?lesson=steps">Кроки: 4 напрямки</a></li><li><a href="lessons.html?lesson=steps2">Кроки: повільно і швидко</a></li><li><a href="lessons.html?lesson=stepstrike">Удар з руху</a></li></ul></div>
-      <div class="mod rv" style="--d:.08s"><div class="k">01</div><h3>Удари руками</h3><ul><li><a href="lessons.html?lesson=jab">Джеб</a></li><li><a href="lessons.html?lesson=cross">Крос</a></li><li><a href="lessons.html?lesson=lhook">Хук передньою</a></li><li><a href="lessons.html?lesson=bfist">Бекфіст</a></li><li><a href="lessons.html?lesson=cork">Коркскрю</a></li><li><a href="lessons.html?lesson=shovel">Шовел-хук</a></li><li><a href="lessons.html?lesson=upper">Апперкот передньою</a></li><li><a href="lessons.html?lesson=rupper">Апперкот задньою</a></li></ul></div>
-      <div class="mod rv" style="--d:.12s"><div class="k">02</div><h3>Траппінг</h3><ul><li><a href="lessons.html?lesson=pak">Пак сао</a></li><li><a href="lessons.html?lesson=lap">Лап сао</a></li><li><a href="lessons.html?lesson=jao">Джао сао</a></li><li><a href="lessons.html?lesson=jut">Подвійний джут сао</a></li></ul></div>
-      <div class="mod rv" style="--d:.16s"><div class="k">03</div><h3>Комбінації</h3><ul><li><a href="lessons.html?lesson=c12">Джеб → крос</a></li><li><a href="lessons.html?lesson=c123">Джеб → крос → хук</a></li><li><a href="lessons.html?lesson=combo">Джеб → хук → прямий передньою</a></li></ul></div>
+      <div class="mod rv"><div class="k">00</div><h3>Основи</h3><ul><li><a href="lessons.html?v=c08f323f&lesson=stance">Стійка: як у неї стати</a></li><li><a href="lessons.html?v=c08f323f&lesson=steps">Кроки: 4 напрямки</a></li><li><a href="lessons.html?v=c08f323f&lesson=steps2">Кроки: повільно і швидко</a></li><li><a href="lessons.html?v=c08f323f&lesson=stepstrike">Удар з руху</a></li></ul></div>
+      <div class="mod rv" style="--d:.08s"><div class="k">01</div><h3>Удари руками</h3><ul><li><a href="lessons.html?v=c08f323f&lesson=jab">Джеб</a></li><li><a href="lessons.html?v=c08f323f&lesson=cross">Крос</a></li><li><a href="lessons.html?v=c08f323f&lesson=lhook">Хук передньою</a></li><li><a href="lessons.html?v=c08f323f&lesson=bfist">Бекфіст</a></li><li><a href="lessons.html?v=c08f323f&lesson=cork">Коркскрю</a></li><li><a href="lessons.html?v=c08f323f&lesson=shovel">Шовел-хук</a></li><li><a href="lessons.html?v=c08f323f&lesson=upper">Апперкот передньою</a></li><li><a href="lessons.html?v=c08f323f&lesson=rupper">Апперкот задньою</a></li></ul></div>
+      <div class="mod rv" style="--d:.12s"><div class="k">02</div><h3>Траппінг</h3><ul><li><a href="lessons.html?v=c08f323f&lesson=pak">Пак сао</a></li><li><a href="lessons.html?v=c08f323f&lesson=lap">Лап сао</a></li><li><a href="lessons.html?v=c08f323f&lesson=jao">Джао сао</a></li><li><a href="lessons.html?v=c08f323f&lesson=jut">Подвійний джут сао</a></li></ul></div>
+      <div class="mod rv" style="--d:.16s"><div class="k">03</div><h3>Комбінації</h3><ul><li><a href="lessons.html?v=c08f323f&lesson=c12">Джеб → крос</a></li><li><a href="lessons.html?v=c08f323f&lesson=c123">Джеб → крос → хук</a></li><li><a href="lessons.html?v=c08f323f&lesson=combo">Джеб → хук → прямий передньою</a></li></ul></div>
       <div class="mod rv" style="--d:.24s"><div class="k">04</div><h3>Незабаром</h3><ul><li><span>Удари ногами</span></li><li><span>Перевірка свого відео</span></li><li><span>Твій персонаж</span></li></ul></div>
     </div>
   </div>
@@ -274,7 +276,7 @@
   <div class="wrap">
     <div class="eyebrow rv">Перший урок: стійка, 2 хвилини</div>
     <h2 class="rv" style="--d:.08s">Готовий<br>до <em>залу</em>?</h2>
-    <a class="btn pri rv" style="--d:.16s" href="lessons.html">Увійти в зал <span class="arr">→</span></a>
+    <a class="btn pri rv" style="--d:.16s" href="lessons.html?v=c08f323f">Увійти в зал <span class="arr">→</span></a>
   </div>
 </div>
 

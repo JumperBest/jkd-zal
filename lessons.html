@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JKD Віртуальний зал: уроки</title>
-<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html) + кроки + типові помилки. Дивишся і тренуєшся.
+<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=0805834b) + кроки + типові помилки. Дивишся і тренуєшся.
      Поки тільки удари руками (ноги в 3D ще неточні). Перевірка свого відео: в розробці.
      Урок вміщається на один екран; під 3D, своя панель: пуск/пауза, повзунок часу, швидкість. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;700;900&display=swap">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="site.css?v=cb7a1eed">
 <style>
   body { font-size:14px; }
   [hidden] { display:none !important; }
@@ -66,7 +66,7 @@
   #home { padding:20px clamp(16px, 2.4vw, 28px) 40px; }
   .welcome { position:relative; border-radius:22px; overflow:hidden; padding:clamp(22px, 3.4vw, 40px); border:1px solid var(--line); isolation:isolate; min-height:260px;
     display:flex; flex-direction:column; justify-content:center;
-    background:linear-gradient(90deg, var(--bg2) 0%, var(--bg2) 42%, rgba(16,20,27,.75) 58%, rgba(16,20,27,.1) 80%, transparent), url(img/welcome.jpg) right 18% / auto 112% no-repeat, var(--bg2); }
+    background:linear-gradient(90deg, var(--bg2) 0%, var(--bg2) 42%, rgba(16,20,27,.75) 58%, rgba(16,20,27,.1) 80%, transparent), url(img/welcome.jpg?v=9af74c99) right 18% / auto 112% no-repeat, var(--bg2); }
   .welcome > * { max-width:520px; }
   .welcome h1 { font-size:clamp(28px, 3.6vw, 48px); font-weight:900; text-transform:uppercase; letter-spacing:-.045em; margin:10px 0 8px; }
   .welcome h1 em { font-style:normal; color:var(--water2); }
@@ -187,7 +187,7 @@
     .stagecol.showtools .tools { display:flex; }
     .stagecol.showtools { position:relative; top:0; }
     .welcome { min-height:380px; justify-content:flex-end;
-      background:linear-gradient(180deg, rgba(16,20,27,.1) 0%, rgba(16,20,27,.75) 50%, var(--bg2) 78%), url(img/welcome.jpg) 62% 15% / cover no-repeat, var(--bg2); }
+      background:linear-gradient(180deg, rgba(16,20,27,.1) 0%, rgba(16,20,27,.75) 50%, var(--bg2) 78%), url(img/welcome.jpg?v=9af74c99) 62% 15% / cover no-repeat, var(--bg2); }
   }
   @media (max-width: 560px) {
     .top { gap:8px; padding:0 10px; }
@@ -209,7 +209,7 @@
 <body>
 <header class="top">
   <button class="iconbtn" id="menuBtn" aria-label="Програма уроків">☰</button>
-  <a class="logo" href="index.html"><i></i>JKD <span>· Віртуальний зал</span></a>
+  <a class="logo" href="index.html?v=20b1875f"><i></i>JKD <span>· Віртуальний зал</span></a>
   <span class="sp"></span>
   <div class="belt"><span>Шлях учня</span><div class="track"><i id="beltBar"></i></div><b id="beltTxt"></b></div>
   <div class="seg" role="group" aria-label="Правша чи лівша"><button data-hand="right">Правша</button><button data-hand="left">Лівша</button></div>
@@ -810,7 +810,7 @@ const player = (() => {
       model = L.model;
       const v = $("view"); v.querySelectorAll("iframe").forEach(f => f.remove());
       iframe = document.createElement("iframe"); iframe.title = "3D-тренер";
-      iframe.src = `trainer3d.html?lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
+      iframe.src = `trainer3d.html?v=0805834b&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
       iframe.onload = () => { apply(); camera(); setT(pending != null ? pending : L.from); if (pending == null && !L.still) play(true); pending = null; };
       v.prepend(iframe);
     } else { setT(L.from); if (!L.still) play(true); }
