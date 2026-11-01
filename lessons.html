@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JKD Віртуальний зал: уроки</title>
-<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=151bd1a0) + кроки + типові помилки. Дивишся і тренуєшся.
+<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=8cf16215) + кроки + типові помилки. Дивишся і тренуєшся.
      Поки тільки удари руками (ноги в 3D ще неточні). Перевірка свого відео: в розробці.
      Урок вміщається на один екран; під 3D, своя панель: пуск/пауза, повзунок часу, швидкість. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -398,7 +398,7 @@ const LESSONS = {
       { t: 0.21,  text: "<b>Рука рушає першою,</b> прямо від підборіддя: без замаху, без відведення назад. Ноги ще стоять." },
       { t: 0.24,  text: "<b>Поштовх задньою: низько.</b> Таз не піднімається. Задня стопа провертається на подушечці, п'ята йде назовні." },
       { t: 0.265, text: "<b>Удар.</b> Стегно й плечі провернулись до кінця. Обидві стопи носками на 30–45° вправо, передня трохи правіше лінії. Кулак повернутий, лікоть близько, підборіддя за плечем." },
-      { t: 0.28,  text: "<b>Задня нога не відстає</b>: підтягується. Вага ≈ 70 % на передній. Передня рука біля обличчя." },
+      { t: 0.28,  text: "<b>Задня нога не відстає</b>: підтягується. Вага ≈ 70 % на передній. Передня рука лишається в стійці, лікоть біля боку: не тягни її назад." },
       { t: 0.31,  text: "<b>Повернення: першим іде стегно.</b> Рука ще пряма, стегно різко йде назад і тягне її за собою, як батіг." },
       { t: 0.40,  text: "<b>Рука на місці, стійка трохи відкрита</b>: ти готовий до хука або до ухилу." },
     ],
@@ -810,7 +810,7 @@ const player = (() => {
       model = L.model;
       const v = $("view"); v.querySelectorAll("iframe").forEach(f => f.remove());
       iframe = document.createElement("iframe"); iframe.title = "3D-тренер";
-      iframe.src = `trainer3d.html?v=151bd1a0&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
+      iframe.src = `trainer3d.html?v=8cf16215&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
       iframe.onload = () => { apply(); camera(); setT(pending != null ? pending : L.from); if (pending == null && !L.still) play(true); pending = null; };
       v.prepend(iframe);
     } else { setT(L.from); if (!L.still) play(true); }
