@@ -92,10 +92,9 @@
   .princ { display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; }
   .princ article { background:var(--bg); padding:0 0 24px; position:relative; transition:background .4s; overflow:hidden; }
   .princ article > :not(.ph) { margin-left:24px; margin-right:24px; }
-  /* квадратна картинка повністю по висоті (голова не обрізається), краї розчиняються в тлі */
-  .princ .ph { aspect-ratio:16 / 10; background:transparent center top / auto 100% no-repeat; margin-bottom:-28px; transition:transform .8s var(--ease);
-    --fade:linear-gradient(180deg, #000 55%, transparent), linear-gradient(90deg, transparent 19%, #000 31%, #000 69%, transparent 81%);
-    -webkit-mask:var(--fade); -webkit-mask-composite:source-in; mask:var(--fade); mask-composite:intersect; }
+  /* квадратна картинка на всю висоту рамки (голова не обрізається); lighten: чорне тло картинки зливається з тлом картки, бокових країв не видно */
+  .princ .ph { aspect-ratio:4 / 3; background:transparent center top / auto 100% no-repeat; margin-bottom:-28px; transition:transform .8s var(--ease); mix-blend-mode:lighten;
+    -webkit-mask:linear-gradient(180deg, #000 60%, transparent); mask:linear-gradient(180deg, #000 60%, transparent); }
   .princ article:hover .ph { transform:scale(1.05); }
   .princ .num { position:relative; }
   .princ article:hover { background:var(--bg2); }
@@ -181,7 +180,7 @@
 </head>
 <body>
 <header id="top"><div class="wrap">
-  <a class="logo" href="index.html?v=20b1875f"><i></i>JKD <span>· Віртуальний зал</span></a>
+  <a class="logo" href="index.html?v=48078bd5"><i></i>JKD <span>· Віртуальний зал</span></a>
   <nav><a href="#how">Як це працює</a><a href="#program">Програма</a></nav>
   <a class="btn sm pri" href="lessons.html?v=c08f323f">Увійти в зал</a>
 </div></header>
@@ -242,7 +241,7 @@
         <div class="kanji" aria-hidden="true">截拳道</div>
         <span class="corner tl"></span><span class="corner br"></span>
         <div class="stage">
-          <iframe id="hero3d" title="3D-тренер" src="trainer3d.html?v=0805834b&lesson=c123&embed=1&hero=1"></iframe>
+          <iframe id="hero3d" title="3D-тренер" src="trainer3d.html?v=151bd1a0&lesson=c123&embed=1&hero=1"></iframe>
           <div class="lbl"><i></i>3D-тренер · джеб → крос → хук · крути мишкою</div>
         </div>
       </div>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JKD Віртуальний зал: уроки</title>
-<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=0805834b) + кроки + типові помилки. Дивишся і тренуєшся.
+<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=151bd1a0) + кроки + типові помилки. Дивишся і тренуєшся.
      Поки тільки удари руками (ноги в 3D ще неточні). Перевірка свого відео: в розробці.
      Урок вміщається на один екран; під 3D, своя панель: пуск/пауза, повзунок часу, швидкість. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -209,7 +209,7 @@
 <body>
 <header class="top">
   <button class="iconbtn" id="menuBtn" aria-label="Програма уроків">☰</button>
-  <a class="logo" href="index.html?v=20b1875f"><i></i>JKD <span>· Віртуальний зал</span></a>
+  <a class="logo" href="index.html?v=48078bd5"><i></i>JKD <span>· Віртуальний зал</span></a>
   <span class="sp"></span>
   <div class="belt"><span>Шлях учня</span><div class="track"><i id="beltBar"></i></div><b id="beltTxt"></b></div>
   <div class="seg" role="group" aria-label="Правша чи лівша"><button data-hand="right">Правша</button><button data-hand="left">Лівша</button></div>
@@ -810,7 +810,7 @@ const player = (() => {
       model = L.model;
       const v = $("view"); v.querySelectorAll("iframe").forEach(f => f.remove());
       iframe = document.createElement("iframe"); iframe.title = "3D-тренер";
-      iframe.src = `trainer3d.html?v=0805834b&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
+      iframe.src = `trainer3d.html?v=151bd1a0&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
       iframe.onload = () => { apply(); camera(); setT(pending != null ? pending : L.from); if (pending == null && !L.still) play(true); pending = null; };
       v.prepend(iframe);
     } else { setT(L.from); if (!L.still) play(true); }
