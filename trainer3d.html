@@ -1285,6 +1285,8 @@ function hairBruce(P) {
     pos.setXYZ(i, x * f + (k > 0.02 ? 0.006 * front * k : 0), y * f + 0.004 * k, z * f);
   }
   geo.computeVertexNormals();
+  const nor = geo.attributes.normal;                                                                         // полюс сфери: нормаль вгору, без білої цятки на маківці
+  for (let i = 0; i < pos.count; i++) if (geo.attributes.position.getY(i) > 0.97 * P.ry) nor.setXYZ(i, 0, 1, 0);
   return geo;
 }
 // рот: тонка лінія; кіай: темна порожнина з верхніми зубами, що відкривається вниз (setMouth 0…1)
