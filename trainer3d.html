@@ -354,10 +354,10 @@ function buildSeries(name) {
     add(t + 0.13, at(P, { px: P + 0.10, py: 0.925, hip: 8, chest: -16, lean: 0.08, rk: LEAD_UP, lk: { ...chinL(0.02), roll: 50 },
       ff: { x: P + 0.40, z: 0.095, yaw: -30 }, rf: { x: P - 0.20, z: -0.010, heel: 45, yaw: -25 },
       say: "Повернення: першим різко йде назад стегно, рука ще пряма, «хльост». Arsenal 75" }));
-    add(t + 0.17, at(P, { px: P + 0.09, hip: 32, chest: 30, lean: 0.05, rk: LEAD_UP, lk: { loc: [0.30, 0.06, 0.06], pole: [0, -1, -0.6], roll: 20 },
+    add(t + 0.17, at(P, { px: P + 0.09, hip: 32, chest: 30, lean: 0.05, rk: { loc: [0.19, 0.04, 0.14], pole: [0, -1, 0.6], roll: 0 }, lk: { loc: [0.30, 0.06, 0.06], pole: [0, -1, -0.6], roll: 20 },   // передня звільняє місце задній
       ff: { x: P + 0.40, z: 0.085, yaw: -20 }, rf: { x: P - 0.20, z: -0.020, heel: 35, yaw: -5 },
       say: "Рука повертається тим самим шляхом, не падає вниз. Arsenal 75" }));
-    add(t + 0.22, at(P, { px: P + 0.09, hip: 40, chest: 44, ff: { x: P + 0.40, z: 0.055, yaw: -5 }, rf: { x: P - 0.20, z: -0.030, heel: 30, yaw: 15 }, rk: LEAD_UP, lk: GUARD_L,
+    add(t + 0.22, at(P, { px: P + 0.09, hip: 40, chest: 44, ff: { x: P + 0.40, z: 0.055, yaw: -5 }, rf: { x: P - 0.20, z: -0.030, heel: 30, yaw: 15 }, rk: GUARD_R, lk: GUARD_L,
       say: "Стійка трохи відкрита: ти готовий до хука або до ухилу. Arsenal 76" }));
     add(t + 0.29, guard(P + 0.08));
     return t + 0.29;
@@ -381,7 +381,7 @@ function buildSeries(name) {
       tag: "бекфіст · бік голови", kiai: true,
       say: "Удар: хльост горизонтальним півколом зліва направо, тильна сторона кісточок. Вага переходить на передню ногу. Cheung/Wong 58, Arsenal 66" }));
     add(t + 0.09, at(P, { ...pushFeet(P, 3), hip: 60, chest: 64, lean: 0.07, ...lk0, rk: { w: [H.x - 0.12, 1.50, tz + 0.10], pole: [0.5, -0.15, -1], roll: 0 } }));
-    add(t + 0.12, at(P, { ...pushFeet(P, 4), hip: 52, chest: 56, ...lk0, rk: { w: [0.24, 1.45, 0.04], pole: [0, -1, 0.4], roll: 0 },
+    add(t + 0.12, at(P, { ...pushFeet(P, 4), hip: 52, chest: 56, ...lk0, rk: { w: [0.24, 1.45, 0.04], pole: [0.3, -0.7, -0.5], roll: 0 },   // лікоть опускається поступово, без «перекиду»
       say: "Рука одразу назад тим самим шляхом, у стійку. Задня нога підтягується." }));
     add(t + 0.16, guard(P + 0.11));
     return t + 0.16;
@@ -448,7 +448,7 @@ function buildSeries(name) {
       tag: "апперкот · підборіддя", kiai: true,
       say: rear ? "Удар: ліве стегно на ціль, вага переходить на передню ногу (~60 %). Arsenal 100" : "Удар: ноги різко розгинаються, поштовх на місці вгору; трохи на носки й ледь назад, вага на задню ногу. Arsenal 98" }));
     add(t + 0.13, at(P, { px: rear ? P + 0.03 : P - 0.02, py: 0.95, hip: hipHit, chest: chHit, ...other,
-      [k]: { w: [UPC[0] + 0.05, UPC[1] + 0.10, UPC[2] + (rear ? 0.05 : -0.05)], pole: rear ? [0, -1, -0.4] : [0, -1, 0.4], roll: 0 }, rf: { heel: 40 },
+      [k]: { w: [UPC[0] - 0.04, UPC[1] + 0.08, UPC[2] + (rear ? 0.05 : -0.05)], pole: rear ? [0, -1, -0.4] : [0, -1, 0.4], roll: 0 }, rf: { heel: 40 },
       say: "Крізь ціль на 10–15 см, і зриваєш убік, як у хука. Arsenal 99" }));
     add(t + 0.18, guard(P, { say: "Назад у стійку." }));
     return t + 0.18;
@@ -456,80 +456,100 @@ function buildSeries(name) {
 
   // ----- траппінг (Cheung/Wong 50–57, 102–106): лише прийоми, де книга чітко каже, що робить кожна рука -----
   // вхід: «питаюча рука»: простягаєш передню, суперник парирує → схрещені руки (cross hand), звідси траппінг
-  const OG = { L: [0.36, 1.36, 0.10], R: [0.46, 1.32, -0.12] };                // руки суперника в стійці (ліва: навпроти твоєї передньої)
+  const OG = { L: [0.40, 1.37, 0.11], R: [0.46, 1.32, -0.12] };                // руки суперника в стійці (ліва: навпроти твоєї передньої)
   const OCH = [0.22, 1.33, 0.05];                                              // його передня рука в позиції схрещених рук
   const CH_R = { w: [0.21, 1.37, 0.10], pole: [0, -1, 0.5], roll: 0, open: 1 };
   const openL = (w, o = {}) => ({ w, pole: [0, -1, -0.5], roll: 0, open: 1, ...o });
   const openR = (w, o = {}) => ({ w, pole: [0, -1, 0.5], roll: 0, open: 1, ...o });
+  const PAK_IN = [0.17, 1.52, -0.12], PAK_MEET = openL([0.21, 1.595, -0.12]), PAK_ON = { follow: "L", d: [-0.04, -0.10, 0.0] }, PAK_LEAD = { tgt: [0.26, -0.05, 0.03], pole: [0, -1, 0.5], roll: 0 };   // передня чекає трохи нижче й ззовні: його рука йде над нею   // пак сао: його зап'ястя / моя долоня зверху / притиснута
+  // його зап'ястя з внутрішнього боку твого передпліччя; у контакті воно йде за твоєю рукою (без розходження)
+  const CH_OPP = { follow: "R", d: [-0.04, -0.02, -0.09] };
   function crossHand(t, P) {
     add(t + 0.04, at(P, { hip: 50, chest: 54, rk: { w: [0.26, 1.40, 0.06], pole: [0, -1, 0.4], roll: 0, open: 1 }, lk: GUARD_L, opp: OG,
       say: "«Питаюча рука»: простягаєш передню руку, суперник мусить її відбити. Cheung/Wong 106" }));
-    add(t + 0.08, at(P, { hip: 50, chest: 54, rk: CH_R, lk: GUARD_L, opp: { L: OCH, R: OG.R },
+    add(t + 0.06, at(P, { hip: 50, chest: 54, rk: { w: [0.26, 1.40, 0.06], pole: [0, -1, 0.4], roll: 0, open: 1 }, lk: GUARD_L, opp: { L: [0.36, 1.45, -0.05], R: OG.R } }));   // його рука заходить зсередини
+    add(t + 0.08, at(P, { hip: 50, chest: 54, rk: CH_R, lk: GUARD_L, opp: { L: CH_OPP, R: OG.R },
       say: "Він парирує, руки схрестились: позиція «схрещених рук» (cross hand). Звідси починається траппінг. Cheung/Wong 106" }));
-    add(t + 0.13, at(P, { hip: 50, chest: 54, rk: CH_R, lk: GUARD_L, opp: { L: OCH, R: OG.R } }));
+    add(t + 0.13, at(P, { hip: 50, chest: 54, rk: CH_R, lk: GUARD_L, opp: { L: CH_OPP, R: OG.R } }));
     return t + 0.13;
   }
   // пак сао проти удару: суперник сам б'є прямий передньою, ми зустрічаємо його руку задньою (Cheung/Wong 54, 92, 113)
   function oppPunch(t, P) {
-    add(t + 0.04, at(P, { hip: 50, chest: 54, rk: GUARD_R, lk: GUARD_L, opp: { L: [0.30, 1.39, 0.08], R: OG.R },
+    // його удар іде по середній лінії над твоєю передньою рукою (не в кулак)
+    add(t + 0.04, at(P, { hip: 50, chest: 54, rk: GUARD_R, lk: GUARD_L, opp: { L: [0.33, 1.47, -0.06], R: OG.R },
       say: "Суперник сам б'є прямий передньою рукою тобі в голову. Cheung/Wong 92, 113" }));
-    add(t + 0.09, at(P, { hip: 50, chest: 54, rk: GUARD_R, lk: GUARD_L, opp: { L: [0.18, 1.42, 0.06], R: OG.R },
+    add(t + 0.09, at(P, { hip: 50, chest: 54, rk: PAK_LEAD, lk: GUARD_L, opp: { L: PAK_IN, R: OG.R },
       say: "Його рука летить до тебе; ти стоїш у стійці, руки в захисті." }));
-    add(t + 0.13, at(P, { hip: 50, chest: 54, rk: GUARD_R, lk: openL([0.17, 1.38, 0.05]), opp: { L: OCH, R: OG.R } }));
+    add(t + 0.13, at(P, { hip: 50, chest: 54, rk: PAK_LEAD, lk: PAK_MEET, opp: { L: PAK_ON, R: OG.R } }));
     return t + 0.13;
   }
   // після удару: стійка, руки суперника назад, відхід
   function trapEnd(t, P) {
-    add(t + 0.05, guard(P, { opp: OG, say: "Руки в стійку." }));
-    return retreat(t + 0.09, P, P - 0.11);
+    add(t + 0.05, guard(P, { opp: { L: [0.42, 1.06, 0.06], R: OG.R }, say: "Руки в стійку." }));   // його рука звільняється низом, не через твій кулак
+    const e = retreat(t + 0.09, P, P - 0.11);
+    add(e + 0.04, guard(P - 0.11, { opp: OG }));
+    return e + 0.04;
   }
+  // задня рука зустрічає його руку перед твоїм обличчям і притискає вниз до його ж тіла; корпус не розвертається боком,
+  // інакше задня рука пройшла б крізь власні груди
   function pak(t, P) {
-    add(t + 0.03, at(P, { hip: 50, chest: 54, rk: CH_R, lk: openL([0.17, 1.37, 0.05]), opp: { L: OCH, R: OG.R },
+    add(t + 0.03, at(P, { hip: 50, chest: 54, rk: PAK_LEAD, lk: PAK_MEET, opp: { L: PAK_ON, R: OG.R },
       say: "Задня рука, відкрита, зустрічає його руку… Cheung/Wong 54" }));
-    add(t + 0.06, at(P, { ...pushFeet(P, 1), hip: 64, chest: 68, rk: { ...chin(-0.07), open: 0 }, lk: openL([0.26, 1.21, 0.17]), opp: { L: [0.28, 1.19, 0.19], R: OG.R },
+    add(t + 0.06, at(P, { ...pushFeet(P, 1), hip: 58, chest: 56, rk: { ...chin(-0.07), open: 0 }, lk: openL([0.32, 1.12, -0.14]), opp: { L: PAK_ON, R: OG.R },
       say: "Пак сао: задня рука шльопком притискає його руку, і в ту ж мить передня б'є. Шльопок і удар: майже один рух. Cheung/Wong 54, 102–103" }));
-    add(t + 0.085, at(P, { ...pushFeet(P, 2), hip: 70, chest: 74, lean: 0.06, rk: chin(0), lk: openL([0.27, 1.19, 0.18]), opp: { L: [0.29, 1.18, 0.19], R: OG.R },
+    add(t + 0.085, at(P, { ...pushFeet(P, 2), hip: 62, chest: 58, lean: 0.06, rk: chin(0), lk: openL([0.33, 1.12, -0.14]), opp: { L: PAK_ON, R: OG.R },
       tag: "прямий · голова", kiai: true, say: "Передня: прямий у голову, поки його рука притиснута. (У книзі є й варіант, у ребра.) Cheung/Wong 54, 103" }));
-    add(t + 0.10, at(P, { ...pushFeet(P, 3), hip: 70, chest: 74, lean: 0.06, rk: chin(0.06), lk: openL([0.27, 1.19, 0.18]), opp: { L: [0.29, 1.18, 0.19], R: OG.R } }));
+    add(t + 0.10, at(P, { ...pushFeet(P, 3), hip: 62, chest: 58, lean: 0.06, rk: chin(0.06), lk: openL([0.33, 1.12, -0.14]), opp: { L: PAK_ON, R: OG.R } }));
     return trapEnd(t + 0.10, P + 0.11);
   }
+  // лап сао: передня хапає його зап'ястя (воно йде за рукою) і смикає до себе й униз, задня б'є над його рукою
   function lap(t, P) {
-    add(t + 0.03, at(P, { hip: 50, chest: 54, rk: openR([0.23, 1.34, 0.07]), lk: GUARD_L, opp: { L: OCH, R: OG.R },
+    const GRAB = { follow: "R", d: [0.02, -0.10, 0.0] }, OR_LOW = [0.48, 1.20, -0.17];
+    add(t + 0.03, at(P, { hip: 50, chest: 54, rk: openR([0.23, 1.40, 0.04]), lk: GUARD_L, opp: { L: GRAB, R: OG.R },
       say: "Передня рука хапає його зап'ястя… Cheung/Wong 50" }));
-    add(t + 0.07, at(P, { px: P + 0.04, py: 0.925, hip: 32, chest: 22, lean: 0.08, rk: openR([0.13, 1.16, 0.18]), lk: chinL(-0.10), rf: { heel: 45 },
-      opp: { L: [0.15, 1.15, 0.17], R: OG.R }, say: "Лап сао: смикаєш його руку до себе й униз, і задньою прямий у голову. Cheung/Wong 50" }));
-    add(t + 0.09, at(P, { px: P + 0.06, py: 0.92, hip: 10, chest: -6, lean: 0.10, rk: openR([0.13, 1.16, 0.18]), lk: { ...chinL(0), roll: 40 }, rf: { heel: 55, yaw: 20 },
-      opp: { L: [0.15, 1.15, 0.17], R: OG.R }, tag: "прямий задньою · голова", kiai: true }));
-    add(t + 0.11, at(P, { px: P + 0.06, py: 0.92, hip: 8, chest: -8, lean: 0.10, rk: openR([0.13, 1.16, 0.18]), lk: { ...chinL(0.04), roll: 40 }, rf: { heel: 50, yaw: 20 },
-      opp: { L: [0.15, 1.15, 0.17], R: OG.R } }));
-    add(t + 0.17, guard(P, { opp: OG, say: "Руки в стійку." }));
-    return t + 0.17;
+    add(t + 0.07, at(P, { px: P + 0.04, py: 0.925, hip: 32, chest: 22, lean: 0.08, rk: openR([0.20, 1.21, 0.20]), lk: chinL(-0.10), rf: { heel: 45 },
+      opp: { L: GRAB, R: OR_LOW }, say: "Лап сао: смикаєш його руку до себе й униз, і задньою прямий у голову. Cheung/Wong 50" }));
+    add(t + 0.09, at(P, { px: P + 0.06, py: 0.92, hip: 10, chest: -6, lean: 0.10, rk: openR([0.20, 1.21, 0.20]), lk: { ...chinL(0), roll: 40 }, rf: { heel: 55, yaw: 20 },
+      opp: { L: GRAB, R: OR_LOW }, tag: "прямий задньою · голова", kiai: true }));
+    add(t + 0.11, at(P, { px: P + 0.06, py: 0.92, hip: 8, chest: -8, lean: 0.10, rk: openR([0.20, 1.21, 0.20]), lk: { ...chinL(0.04), roll: 40 }, rf: { heel: 50, yaw: 20 },
+      opp: { L: GRAB, R: OR_LOW } }));
+    add(t + 0.17, guard(P, { opp: { L: [0.42, 1.06, 0.12], R: OG.R }, say: "Руки в стійку." }));   // його рука звільняється низом
+    add(t + 0.24, guard(P, { opp: OG }));
+    return t + 0.24;
   }
+  // джао сао: передня звільняється назовні й униз, задня зверху притискає його руку вниз до його тіла, передня б'є долонею.
+  // Корпус не розвертається боком: інакше задня рука проходить крізь власні груди.
   function jao(t, P) {
-    add(t + 0.03, at(P, { hip: 50, chest: 54, rk: openR([0.12, 1.24, 0.03]), lk: openL([0.22, 1.35, 0.08]), opp: { L: OCH, R: OG.R },
+    const PIN = { follow: "L", d: [-0.04, -0.10, 0.0] };
+    add(t + 0.03, at(P, { hip: 50, chest: 54, rk: openR([0.14, 1.24, 0.19]), lk: openL([0.21, 1.45, -0.02]), opp: { L: PIN, R: OG.R },
       say: "Джао сао: передня рука звільняється (знімається з контакту), а задня одразу притискає його руку. Cheung/Wong 52" }));
-    add(t + 0.06, at(P, { ...pushFeet(P, 1), hip: 64, chest: 68, rk: { ...chin(-0.08), open: 2 }, lk: openL([0.25, 1.27, 0.10]), opp: { L: [0.25, 1.26, 0.09], R: OG.R } }));
-    add(t + 0.085, at(P, { ...pushFeet(P, 2), hip: 70, chest: 74, lean: 0.06, rk: { ...chin(0), open: 2 }, lk: openL([0.25, 1.27, 0.10]), opp: { L: [0.25, 1.26, 0.09], R: OG.R },
+    add(t + 0.06, at(P, { ...pushFeet(P, 1), hip: 58, chest: 56, rk: { ...chin(-0.08), open: 2 }, lk: openL([0.32, 1.13, -0.12]), opp: { L: PIN, R: OG.R } }));
+    add(t + 0.085, at(P, { ...pushFeet(P, 2), hip: 62, chest: 58, lean: 0.06, rk: { ...chin(0), open: 2 }, lk: openL([0.33, 1.13, -0.13]), opp: { L: PIN, R: OG.R },
       tag: "долоня · підборіддя", kiai: true, say: "Удар долонею в голову тією ж рукою, задня тримає його руку. Cheung/Wong 52" }));
-    add(t + 0.10, at(P, { ...pushFeet(P, 3), hip: 70, chest: 74, lean: 0.06, rk: { ...chin(0.05), open: 2 }, lk: openL([0.25, 1.27, 0.10]), opp: { L: [0.25, 1.26, 0.09], R: OG.R } }));
+    add(t + 0.10, at(P, { ...pushFeet(P, 3), hip: 62, chest: 58, lean: 0.06, rk: { ...chin(0.05), open: 2 }, lk: openL([0.33, 1.13, -0.13]), opp: { L: PIN, R: OG.R } }));
     return trapEnd(t + 0.10, P + 0.11);
   }
-  // подвійний джут сао: руки суперника попереду; хапаєш обидва зап'ястя, смикаєш униз, одне передпліччя затискає обидві його руки, друга рука б'є
+  // подвійний джут сао: руки суперника попереду; хапаєш обидва зап'ястя, смикаєш униз, одне передпліччя затискає обидві його руки, друга рука б'є.
+  // Його зап'ястя в захопленні йдуть під твоїми долонями; заднє передпліччя лягає поперек, лікоть назовні (не в груди).
   function jut(t, P) {
-    const OJ = { L: [0.30, 1.30, 0.08], R: [0.32, 1.28, -0.10] }, DOWN = { L: [0.27, 1.06, 0.06], R: [0.28, 1.05, -0.06] };
+    const OJ = { L: [0.37, 1.28, 0.13], R: [0.33, 1.28, -0.08] }, DOWN = { L: [0.33, 1.02, 0.03], R: [0.31, 1.01, -0.11] };
+    const HOLD = { L: { follow: "R", d: [0.02, -0.09, 0] }, R: { follow: "L", d: [0.02, -0.09, 0] } };
+    const PIN = { w: [0.37, 1.115, 0.04], pole: [0.3, -0.1, -1], roll: 90 };   // лікоть назовні, рука не через груди
     add(t, guard(P, { opp: OJ, say: "Подвійний джут сао: обидві руки суперника попереду. Cheung/Wong 57" }));
-    add(t + 0.05, at(P, { hip: 46, chest: 48, rk: openR([0.29, 1.32, 0.10]), lk: openL([0.31, 1.29, -0.09]), opp: OJ,
+    add(t + 0.05, at(P, { px: P + 0.04, hip: 50, chest: 52, rk: openR([0.36, 1.37, 0.13]), lk: openL([0.32, 1.37, -0.08]), opp: HOLD,
       say: "Обома руками хапаєш обидва його зап'ястя… Cheung/Wong 57" }));
-    add(t + 0.09, at(P, { py: 0.90, hip: 46, chest: 48, lean: 0.08, rk: openR([0.26, 1.07, 0.08]), lk: openL([0.28, 1.05, -0.07]), opp: DOWN,
+    add(t + 0.09, at(P, { px: P + 0.04, py: 0.90, hip: 50, chest: 52, lean: 0.08, rk: openR([0.29, 1.13, 0.07]), lk: openL([0.27, 1.12, -0.11]), opp: HOLD,
       say: "…і різко смикаєш униз. Cheung/Wong 57" }));
-    add(t + 0.13, at(P, { py: 0.91, hip: 42, chest: 44, lean: 0.08, rk: { loc: [0.22, -0.10, 0.10], pole: [0, -1, 0.5], roll: 0 }, lk: { w: [0.30, 1.09, 0.15], pole: [-1, -0.2, -0.3], roll: 90 },
+    add(t + 0.13, at(P, { px: P + 0.04, py: 0.91, hip: 48, chest: 50, lean: 0.08, rk: { w: [0.20, 1.33, 0.15], pole: [0, -1, 0.5], roll: 0 }, lk: PIN,
       opp: DOWN, say: "Одне передпліччя (тут: заднє) лягає впоперек обох його рук, вони затиснуті, друга рука вільна. Cheung/Wong 57" }));
-    add(t + 0.155, at(P, { ...pushFeet(P, 1), hip: 60, chest: 62, rk: chin(-0.07), lk: { w: [0.31, 1.09, 0.15], pole: [-1, -0.2, -0.3], roll: 90 }, opp: DOWN }));
-    add(t + 0.18, at(P, { ...pushFeet(P, 2), hip: 68, chest: 72, lean: 0.06, rk: chin(0), lk: { w: [0.31, 1.09, 0.15], pole: [-1, -0.2, -0.3], roll: 90 }, opp: DOWN,
+    add(t + 0.155, at(P, { ...pushFeet(P, 1), hip: 54, chest: 52, rk: chin(-0.07), lk: PIN, opp: DOWN }));
+    add(t + 0.18, at(P, { ...pushFeet(P, 2), hip: 58, chest: 54, lean: 0.06, rk: chin(0), lk: PIN, opp: DOWN,
       tag: "прямий · голова", kiai: true, say: "Вільна рука: удар у голову. Cheung/Wong 57" }));
-    add(t + 0.195, at(P, { ...pushFeet(P, 3), hip: 68, chest: 72, lean: 0.06, rk: chin(0.05), lk: { w: [0.31, 1.09, 0.15], pole: [-1, -0.2, -0.3], roll: 90 }, opp: DOWN }));
-    add(t + 0.25, guard(P + 0.11, { opp: OJ, say: "Руки в стійку." }));
-    return retreat(t + 0.29, P + 0.11, P);
+    add(t + 0.195, at(P, { ...pushFeet(P, 3), hip: 58, chest: 54, lean: 0.06, rk: chin(0.05), lk: PIN, opp: DOWN }));
+    add(t + 0.25, guard(P + 0.11, { opp: { L: [0.42, 1.06, 0.12], R: [0.44, 1.04, -0.12] }, say: "Руки в стійку." }));   // його руки звільняються низом
+    const e = retreat(t + 0.29, P + 0.11, P);
+    add(e + 0.04, guard(P, { opp: OJ }));
+    return e + 0.04;
   }
 
   const S = -0.40;
@@ -538,7 +558,7 @@ function buildSeries(name) {
   const TRAP_P = -0.22;
   const START = TRAPS.includes(name) ? TRAP_P : name === "rupper" ? CLOSE + 0.24 : name === "shovel" ? CLOSE + 0.15 : name === "upper" ? CLOSE + 0.18 : S;
   if (name === "cork") add(0, { ...guard(S + 0.02), pz: 0.17, ff: { x: S + 0.34, z: 0.17 + ST.fz }, rf: { x: S - 0.28, z: 0.17 + ST.rz }, say: "Стійка: суперник трохи ліворуч від тебе." });
-  else add(0, guard(START, { say: "Стійка: передня рука розслаблена, лікоть біля боку, кулак на рівні плеча; задня біля підборіддя. Arsenal 33–34.", ...(TRAPS.includes(name) ? { opp: name === "jut" ? { L: [0.30, 1.30, 0.08], R: [0.32, 1.28, -0.10] } : OG } : {}) }));
+  else add(0, guard(START, { say: "Стійка: передня рука розслаблена, лікоть біля боку, кулак на рівні плеча; задня біля підборіддя. Arsenal 33–34.", ...(TRAPS.includes(name) ? { opp: name === "jut" ? { L: [0.37, 1.28, 0.13], R: [0.33, 1.28, -0.08] } : OG } : {}) }));
   t = 0.18;
   if (name === "pak" || name === "lap" || name === "jao") {
     t = name === "pak" ? oppPunch(t, TRAP_P) : crossHand(t, TRAP_P);
@@ -776,7 +796,7 @@ function frame(a) { a *= RAD; return { F: V(Math.cos(a), 0, -Math.sin(a)), R: V(
 function body(s) {
   const P = V(s.px, s.py, s.pz), C = frame(s.chest), H = frame(s.hip);
   const neck = P.clone().addScaledVector(UP, 0.48).addScaledVector(C.F, s.lean).add(V(-(s.lb || 0), 0, 0));   // lb, нахил корпусу назад (удари ногами)
-  const sh = neck.clone().addScaledVector(UP, -0.03);
+  const sh = neck.clone().addScaledVector(UP, -0.045);                         // плечовий суглоб усередині тулуба (дельти, частина оболонки)
   return { P, C, H, neck,
     rS: sh.clone().addScaledVector(C.R, 0.19), lS: sh.clone().addScaledVector(C.R, -0.19),
     rH: P.clone().addScaledVector(UP, -0.04).addScaledVector(H.R, 0.10),
@@ -784,7 +804,7 @@ function body(s) {
 }
 function handWorld(spec, b, side) {
   if (spec.w) return V(...spec.w);
-  if (spec.tgt) return (side === "R" ? b.rS : b.lS).clone().add(V(...spec.tgt));
+  if (spec.tgt) return (side === "R" ? b.rS : b.lS).clone().add(V(...spec.tgt)).addScaledVector(UP, 0.015);   // +1,5 см: плече нижче, кулаки там, де були
   const [f, u, r] = spec.loc;
   return b.neck.clone().addScaledVector(b.C.F, f).addScaledVector(UP, u).addScaledVector(b.C.R, r);
 }
@@ -820,7 +840,10 @@ function sample(t) {
 }
 function ik(root, target, l1, l2, pole) {
   const d = target.clone().sub(root); let dist = d.length();
-  const dir = d.normalize(); dist = Math.min(Math.max(dist, 0.05), l1 + l2 - 1e-4);
+  // м'яка межа: біля повного випрямлення лікоть не «перескакує» (без цього за кадр стрибав на ~8 см)
+  const L = l1 + l2, d0 = L * 0.94, sw = L - d0;
+  if (dist > d0) dist = d0 + sw * (1 - Math.exp(-(dist - d0) / sw));
+  const dir = d.normalize(); dist = Math.min(Math.max(dist, 0.05), L - 1e-4);
   const along = (l1 * l1 + dist * dist - l2 * l2) / (2 * dist), h = Math.sqrt(Math.max(0, l1 * l1 - along * along));
   const pd = pole.clone().addScaledVector(dir, -pole.dot(dir)).normalize();
   return { mid: root.clone().addScaledVector(dir, along).addScaledVector(pd, h), end: root.clone().addScaledVector(dir, dist) };
@@ -1035,8 +1058,8 @@ const HEAD_YAW = 0.3;                                    // голова пов�
 // між ними плавне скручування (видно закрутку в кросі й хуку). Оновлюється щокадру в pose().
 const TORSO = { SEG: 40, PROF: [[0, 0, 0, 0], [0.015, 0.07, 0.05, 0.055], [0.05, 0.135, 0.085, 0.095], [0.10, 0.168, 0.095, 0.105],
   [0.15, 0.16, 0.09, 0.095], [0.21, 0.138, 0.085, 0.08], [0.27, 0.136, 0.088, 0.078], [0.34, 0.152, 0.098, 0.085],
-  [0.41, 0.18, 0.106, 0.092], [0.47, 0.202, 0.106, 0.092], [0.525, 0.218, 0.098, 0.088], [0.555, 0.208, 0.088, 0.08],
-  [0.578, 0.17, 0.072, 0.07], [0.594, 0.105, 0.055, 0.056], [0.604, 0.05, 0.045, 0.045], [0.608, 0, 0, 0]] };   // лінія плечей плавно йде до шиї (трапеції), без «полиці» над плечовим суглобом
+  [0.41, 0.18, 0.106, 0.092], [0.47, 0.202, 0.106, 0.092], [0.525, 0.226, 0.1, 0.09], [0.555, 0.236, 0.092, 0.084],
+  [0.578, 0.2, 0.078, 0.074], [0.594, 0.105, 0.055, 0.056], [0.604, 0.05, 0.045, 0.045], [0.608, 0, 0, 0]] };   // лінія плечей плавно йде до шиї (трапеції), без «полиці» над плечовим суглобом
 (function buildTorso() {
   const { SEG, PROF } = TORSO, n = PROF.length, geo = new THREE.BufferGeometry(), idx = [];
   geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n * (SEG + 1) * 3), 3));
@@ -1116,6 +1139,7 @@ const parts = {
   joints: [0.053, 0.053, 0.041, 0.041, 0.062, 0.062, 0.053, 0.053, 0.037, 0.037]
     .map((r, i) => ball(r, i === 8 ? M.lead : i === 9 ? M.rear : M.suit)),
 };
+[parts.joints[0], parts.joints[1], parts.trR, parts.trL].forEach(o => o.visible = false);   // без кульок на плечах: плече, частина тулуба
 
 // ---------- кулак з пальцями ----------
 // локальні осі: x: уперед (від зап'ястя до кісточок), y, бік великого пальця (вгору у вертикальному кулаці),
@@ -1209,22 +1233,25 @@ const oNeckMesh = cyl(0.05, OM.skin);
 // руки суперника: за замовчуванням опущені до живота; у траппінгу, за ключами opp: { L: [x,y,z], R: [x,y,z] } (зап'ястя)
 const OPP_ARM = ["L", "R"].map((side, i) => ({ side, sh: OPP_SH[i], rest: [V(0.48, 1.12, 0.16), V(0.50, 1.10, -0.26)][i],
   pole: [V(-0.2, -1, 0.6), V(-0.2, -1, -0.6)][i], up: cyl(0.045, OM.body), lo: cyl(0.038, OM.body), fist: ball(0.045, OM.dark) }));
+// значення ключа: [x,y,z] або { follow: "L" | "R", d: [dx,dy,dz] }: зап'ястя йде під рукою бійця (контакт без розходження)
+let HANDS_NOW = { R: V(0, 0, 0), L: V(0, 0, 0) };
+const oppVal = v => Array.isArray(v) ? V(...v) : HANDS_NOW[v.follow].clone().add(V(...v.d));
 function oppWrist(t, a) {
   const ok = keys.filter(k => k.opp && k.opp[a.side]);
   if (!ok.length) return a.rest.clone();
-  if (t <= ok[0].t) return V(...ok[0].opp[a.side]);
+  if (t <= ok[0].t) return oppVal(ok[0].opp[a.side]);
   for (let i = 0; i < ok.length - 1; i++) if (t < ok[i + 1].t) {
     const u = smooth(ok[i].t, ok[i + 1].t, t);
-    return V(...ok[i].opp[a.side]).lerp(V(...ok[i + 1].opp[a.side]), u);
+    return oppVal(ok[i].opp[a.side]).lerp(oppVal(ok[i + 1].opp[a.side]), u);
   }
-  return V(...ok[ok.length - 1].opp[a.side]);
+  return oppVal(ok[ok.length - 1].opp[a.side]);
 }
 function drawOppArms(t) {
   const off = opp.torso.position;
   OPP_ARM.forEach(a => {
     [a.up, a.lo, a.fist].forEach(o => o.visible = opp.torso.visible);
     const sh = a.sh.clone().add(off), w = oppWrist(t, a).add(off), r = ik(sh, w, 0.29, 0.27, a.pole);
-    setCyl(a.up, sh, r.mid); setCyl(a.lo, r.mid, r.end); a.fist.position.copy(r.end);
+    setCyl(a.up, sh, r.mid); setCyl(a.lo, r.mid, r.end); a.fist.position.copy(r.end); a.now = { sh, mid: r.mid, end: r.end };
   });
 }
 // мітки цілей на голові: підборіддя і лівий бік щелепи суперника
@@ -1594,6 +1621,7 @@ setZone(new URLSearchParams(location.search).get("zone") || "gym");
 
 // ---------- стан і UI ----------
 const keys = LESSON === "hookkick" ? buildKickKeys() : ["steps", "steps2", "stepstrike"].includes(LESSON) ? buildStepsKeys(LESSON) : LESSON === "guard" ? buildGuardKeys() : (SERIES.includes(LESSON) || HANDS.includes(LESSON)) ? buildSeries(LESSON) : buildKeys(), vecs = keys.map(keyVec), END = keys[keys.length - 1].t;
+let SKEL = null;
 let T = 0, playing = true, loop = true, prevK = null, hitShow = 0, hitTag = "", hitAt = V(0, 0, 0);
 const $ = id => document.getElementById(id);
 $("steps").innerHTML = keys.filter(k => k.say).map(k => `<li data-t="${k.t}">${k.say}</li>`).join("");
@@ -1651,7 +1679,7 @@ function pose(t, simDt) {
     }
   } else if (simDt > 0) tgt.step(simDt, null);
   prevK = { R: want.R.clone(), L: want.L.clone(), F: want.F.clone() };
-  tgt.draw(); if (tgt === TG.opp) opp.torso.position.x += 0.06 * bodyKick; drawOppArms(t);
+  tgt.draw(); if (tgt === TG.opp) opp.torso.position.x += 0.06 * bodyKick; HANDS_NOW = { R: s.rk, L: s.lk }; drawOppArms(t);
   const rs = tgt.solid(s.rk), ls = tgt.solid(s.lk), fs = tgt.solid(instep);
   if (fs.depth > 0) {                                                       // стопа не проходить крізь ціль, зсуваємо всю стопу
     const d = fs.k.clone().sub(instep);
@@ -1695,6 +1723,7 @@ function pose(t, simDt) {
   placeShoe(parts.rShoe, rf); placeShoe(parts.lShoe, lf);
   [b.rS, b.lS, ra.mid, la.mid, b.rH, b.lH, rl.mid, ll.mid, rf.ankle, lf.ankle].forEach((p, i) => parts.joints[i].position.copy(p));
   pushTrail(trails.R, ra.knuckle); pushTrail(trails.L, la.knuckle);
+  SKEL = { s, b, ra, la, rl, ll, rf, lf };                                 // скелет кадру (для перевірки проникнень)
 
   $("s-er").textContent = angle(b.rS, ra.mid, ra.end) + "°";
   $("s-el").textContent = angle(b.lS, la.mid, la.end) + "°";
