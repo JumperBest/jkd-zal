@@ -1697,7 +1697,7 @@ function pose(t, simDt) {
   abs.position.copy(b.P);                                                  // талія нахиляється до грудей, поворот, між стегнами й плечима
   abs.quaternion.setFromUnitVectors(UP, chestC.clone().sub(b.P).normalize())
     .multiply(new THREE.Quaternion().setFromAxisAngle(UP, (s.hip + s.chest) / 2 * RAD));
-  const headC = b.neck.clone().addScaledVector(UP, 0.15);
+  const headC = b.neck.clone().addScaledVector(UP, 0.14);
   setCyl(parts.neckB, b.neck.clone().addScaledVector(UP, -0.008), headC.clone().addScaledVector(UP, -0.05));
   setCyl(parts.collar, b.neck.clone().addScaledVector(UP, -0.013), b.neck.clone().addScaledVector(UP, 0.022));
   setCyl(parts.trR, b.neck.clone().addScaledVector(UP, 0.01), b.rS); setCyl(parts.trL, b.neck.clone().addScaledVector(UP, 0.01), b.lS);

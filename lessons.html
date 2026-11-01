@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JKD Віртуальний зал: уроки</title>
-<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=682a2f6d) + кроки + типові помилки. Дивишся і тренуєшся.
+<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=4435ded2) + кроки + типові помилки. Дивишся і тренуєшся.
      Поки тільки удари руками (ноги в 3D ще неточні). Перевірка свого відео: в розробці.
      Урок вміщається на один екран; під 3D, своя панель: пуск/пауза, повзунок часу, швидкість. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -810,7 +810,7 @@ const player = (() => {
       model = L.model;
       const v = $("view"); v.querySelectorAll("iframe").forEach(f => f.remove());
       iframe = document.createElement("iframe"); iframe.title = "3D-тренер";
-      iframe.src = `trainer3d.html?v=682a2f6d&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
+      iframe.src = `trainer3d.html?v=4435ded2&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
       iframe.onload = () => { apply(); camera(); setT(pending != null ? pending : L.from); if (pending == null && !L.still) play(true); pending = null; };
       v.prepend(iframe);
     } else { setT(L.from); if (!L.still) play(true); }
