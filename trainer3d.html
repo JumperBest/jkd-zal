@@ -1286,7 +1286,7 @@ function hairBruce(P) {
   }
   geo.computeVertexNormals();
   const nor = geo.attributes.normal;                                                                         // полюс сфери: нормаль вгору, без білої цятки на маківці
-  for (let i = 0; i < pos.count; i++) if (geo.attributes.position.getY(i) > 0.97 * P.ry) nor.setXYZ(i, 0, 1, 0);
+  for (let i = 0; i <= 128; i++) nor.setXYZ(i, 0, 1, 0);                                                     // перший ряд вершин сфери = полюс
   return geo;
 }
 // рот: тонка лінія; кіай: темна порожнина з верхніми зубами, що відкривається вниз (setMouth 0…1)
@@ -1335,7 +1335,11 @@ function buildHead(g, P) {
   mouthHole = new THREE.Group(); mouthHole.visible = false; g.add(mouthHole);
   piece(mouthHole, new THREE.SphereGeometry(1, 24, 16), std(0x3a0d0d, { roughness: 0.9 }), [0, 0, 0], [0.0075, 0.5, 0.0165]);
   piece(mouthHole, new THREE.BoxGeometry(1, 1, 1), white, [0.0025, 0.4, 0], [0.004, 0.14, 0.022]);            // верхні зуби
-  piece(g, P.hairBruce ? hairBruce(P) : hairGeo(P, 1), std(P.hairC, { roughness: 0.5 }), [0, 0, 0]);                                    // волосся
+  const hairM = std(P.hairC, { roughness: 0.5 }), hairG = P.hairBruce ? hairBruce(P) : hairGeo(P, 1);
+  piece(g, hairG, hairM, [0, 0, 0]);
+  const crown = hairG.attributes.position;                                                                   // шапочка на маківці: закриває щілину на полюсі волосся
+  piece(g, new THREE.SphereGeometry(0.014, 16, 10), hairM, [crown.getX(0), crown.getY(0) - 0.006, crown.getZ(0)], [1, 0.6, 1]);
+                                  // волосся
   setMouth(0);
 }
 function setMouth(o) {
