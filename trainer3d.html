@@ -102,8 +102,8 @@ const JAW = onHead(-0.5, -0.45, 0.74);                          // лівий б
 const SERIES = ["c12", "c123", "ckp", "cpk", "ckc"];                 // топ-5 комбінацій з книг (Arsenal 161–188)
 const QS = new URLSearchParams(location.search);
 const TRAPS = ["pak", "lap", "jao", "jut"];                                    // траппінг (Cheung/Wong)
-const EVADE = ["slipr", "slipl", "duck", "snap", "weave", "roll", "bob", "side", "snapjab", "dblj", "weavehook"];   // увороти й комбінації з ними
-const FEINT = ["feint", "fakejc", "fakejk"];                                       // обманки (Arsenal 178–179, 195–196)                                                          // увороти (Arsenal, гл. 9)
+const EVADE = ["slipr", "slipl", "duck", "snap", "weave", "roll", "bob", "side", "snapjab", "dblj", "weavehook", "pivot", "duckup", "duckshov", "bobcross"];   // увороти й комбінації з ними
+const FEINT = ["feint", "fakejc", "fakejk", "fakekj"];                                       // обманки (Arsenal 178–179, 195–196)                                                          // увороти (Arsenal, гл. 9)
 const HANDS = ["cross", "bfist", "cork", "shovel", "upper", "rupper", ...TRAPS, ...EVADE, ...FEINT];                 // окремі удари руками (buildSeries)
 const LESSON = [...HANDS, "hookkick", "steps", "steps2", "stepstrike", "guard", ...SERIES].includes(QS.get("lesson")) ? QS.get("lesson") : "combo";
 if (QS.has("embed")) document.body.classList.add("embed");
@@ -263,9 +263,9 @@ function buildSeries(name) {
     add(t, at(P, { hip: fromJab ? 66 : 44, chest: fromJab ? 70 : 46, rf: { x: rear0, heel: 30 }, rk: fromJab ? chin(-0.03) : GUARD_R,
       lk: { loc: [0.24, 0.08, 0.05], pole: [0, -1, -0.5], roll: 5 }, say }));
     add(t + 0.022, at(P, { px: P + 0.03, py: 0.925, hip: 30, chest: 28, lean: 0.07, rf: { x: rear0 + 0.03, heel: 45, yaw: 30, lift: 0.01 },
-      rk: fromJab ? { tgt: [0.40, 0.02, -0.02], pole: [0, -1, 0.5], roll: 0 } : { tgt: [0.34, 0.0, -0.04], pole: [0, -1, 0.6], roll: 0 }, lk: chinL(-0.22) }));
-    add(t + 0.042, at(P, { px: P + 0.07, py: 0.925, hip: 5, chest: -8, lean: 0.10, rf: { x: rear0 + 0.08, heel: 55, yaw: 15, lift: 0.015 }, rk: LEAD_CHIN, lk: chinL(0), tag: "крос · підборіддя", kiai }));
-    add(t + 0.062, at(P, { px: P + 0.07, py: 0.94, hip: 0, chest: -12, lean: 0.10, rf: { x: rear0 + 0.11, heel: 45, yaw: 15 }, rk: LEAD_CHIN, lk: chinL(0.05) }));
+      rk: fromJab ? { tgt: [0.40, 0.02, -0.02], pole: [0, -1, 0.5], roll: 0 } : { tgt: [0.34, 0.0, -0.04], pole: [0, -1, 0.6], roll: 0 }, lk: { ...chinL(-0.22), roll: 35 } }));
+    add(t + 0.042, at(P, { px: P + 0.07, py: 0.925, hip: 5, chest: -8, lean: 0.10, rf: { x: rear0 + 0.08, heel: 55, yaw: 15, lift: 0.015 }, rk: LEAD_CHIN, lk: { ...chinL(0), roll: 60 }, tag: "крос · підборіддя", kiai }));
+    add(t + 0.062, at(P, { px: P + 0.07, py: 0.94, hip: 0, chest: -12, lean: 0.10, rf: { x: rear0 + 0.11, heel: 45, yaw: 15 }, rk: LEAD_CHIN, lk: { ...chinL(0.05), roll: 60 } }));
     return t + 0.062;
   }
   // довгий хук передньою з розворотом стоп (Tao 127, Arsenal 89–97), закриває стійку після кросу
@@ -343,7 +343,8 @@ function buildSeries(name) {
     add(t, guard(P, { say: "Крос: ціль відкрита, б'єш прямо зі стійки, без замаху й без підготовки. Arsenal 71" }));
     add(t + 0.03, at(P, { hip: 36, chest: 34, rk: LEAD_UP, lk: { loc: [0.36, 0.06, 0.07], pole: [0, -1, -0.5], roll: 10 }, rf: { heel: 32 },
       say: "Рука рушає першою: ноги ще стоять. Рука раніше за ногу, для кросу це ще важливіше. Arsenal 71" }));
-    add(t + 0.06, at(P, { px: P + 0.05, py: 0.925, hip: 14, chest: 4, lean: 0.07, rk: LEAD_UP, lk: chinL(-0.14),
+    add(t + 0.06, at(P, { px: P + 0.05, py: 0.925, hip: 14, chest: 4, lean: 0.07, rk: LEAD_UP, lk: { ...chinL(-0.14), roll: 35 },   // кулак починає повертатись на третині шляху (Arsenal 74)
+     
       ff: { x: P + 0.36, z: 0.065, yaw: 0, lift: 0.006 }, rf: { x: P - 0.27, z: -0.040, heel: 55, yaw: 10 },
       say: "Поштовх задньою: низько, ковзом, не підстрибуючи. Задня стопа провертається на подушечці, п'ята назовні. Arsenal 72" }));
     add(t + 0.085, at(P, { px: P + 0.10, py: 0.92, hip: -12, chest: -28, lean: 0.10, rk: LEAD_UP2, lk: { ...chinL(0), roll: 60 },
@@ -656,7 +657,7 @@ function buildSeries(name) {
       "Ліва (задня) нога ставиться слідом: стійка та сама. Правило: куди йдеш — та нога перша.",
       "Його рука повертається, ти в стійці збоку від нього."] });
   // боб-енд-вівер вліво під його правий хук: вершина «U» справа → коліна складаються → вгору вліво (Arsenal 110)
-  function bob(t, P) {
+  function bob(t, P, short) {
     const G = { rk: GUARD_R, lk: GUARD_L };
     add(t, guard(P, { opp: OG, say: "Суперник б'є хук задньою рукою — дугою з твого лівого боку." }));
     add(t + 0.04, at(P, { ...G, pz: 0.08, py: 0.90, hip: 45, chest: 46, lean: 0.06, rf: { heel: 30 }, opp: { L: OG.L, R: [0.42, 1.45, -0.42] },
@@ -667,6 +668,7 @@ function buildSeries(name) {
       say: "Хук пролітає над головою. Вага переходить на ліву ногу. Arsenal 110" }));
     add(t + 0.14, at(P, { ...G, px: P - 0.04, py: 0.88, pz: -0.14, hip: 50, chest: 55, lean: 0.06, rf: { heel: 5 }, opp: { L: OG.L, R: [0.10, 1.46, 0.26] },
       say: "Вгору вліво — вершина «U» з іншого боку. Голова над коліном. Звідси зручно бити. Arsenal 110" }));
+    if (short) return t + 0.14;
     add(t + 0.22, at(P, { ...G, px: P - 0.04, pz: -0.14, rf: { heel: 15 }, opp: OG, say: "Його рука повертається, ти в стійці." }));
     add(t + 0.28, at(P, { ...G, px: P - 0.04, pz: -0.14, rf: { heel: 15 }, opp: OG }));
     return t + 0.28;
@@ -710,6 +712,36 @@ function buildSeries(name) {
         "Кулак пролітає повз ліве вухо. Arsenal 107", "Ти справа, як заведена пружина…", ""] });
     return hook(t + 0.01, P, "…і хук передньою назад уліво: удар іде туди ж, куди й вага. Уся вага в ударі. Arsenal 107, 110");
   }
+  // розворот (pivot) на передній нозі: задня йде дугою вправо, ти сходиш з лінії й лишаєшся обличчям до нього (Arsenal 104, 3)
+  const pivot = (t, P) => evade(t, P, { tag: "розворот · кулак повз",
+    mid: { pz: 0.05, px: P + 0.02, hip: 42, chest: 46, ff: { yaw: 10 }, rf: { x: P - 0.27, z: 0.0, heel: 30, lift: 0.03 } },
+    out: { pz: 0.12, px: P + 0.03, py: 0.92, hip: 36, chest: 40, ff: { yaw: 0 }, rf: { x: P - 0.22, z: 0.14, heel: 25, yaw: 30 } },
+    s: ["Суперник зараз ударить прямим тобі в голову.",
+      "Передня нога — вісь. Задня йде дугою вправо. Arsenal 104",
+      "Ти зійшов з лінії під кутом: кулак повз, а ти досі обличчям до нього. Arsenal 104",
+      "Звідси зручно бити коркскрю чи шовел-хуком. Arsenal 104",
+      "Ти в стійці під новим кутом."] });
+  // з комбінацій прибираємо стартову «стійку» удару, щоб рух ішов прямо з уворота, без зайвого вставання
+  const from = (fn, ...a) => { const n = ks.length, r = fn(...a); ks.splice(n, 1); return r; };
+  const DUCK = { mid: { py: 0.76, lean: 0.06, rf: { heel: 30 } }, out: { py: 0.68, lean: 0.07, rf: { heel: 30 } } };
+  // нирок → апперкот: апперкоти б'ють, виходячи з присіду (Arsenal 100, 110)
+  function duckup(t, P) {
+    t = evade(t, P, { short: true, tag: "нирок · кулак над головою", ...DUCK,
+      s: ["Суперник зараз ударить тобі в голову.", "Нирок: коліна складаються. Arsenal 109", "Кулак пролітає над головою.", "Ти внизу, ноги заряджені…", ""] });
+    return from(upper, t + 0.01, P, false);
+  }
+  // нирок → шовел-хук: «у шовел виходиш з нирка чи ухилу» (Arsenal 98)
+  function duckshov(t, P) {
+    t = evade(t, P, { short: true, tag: "нирок · кулак над головою", ...DUCK,
+      s: ["Суперник зараз ударить тобі в голову.", "Нирок: коліна складаються. Arsenal 109", "Кулак пролітає над головою.", "Ти внизу, близько до нього…", ""] });
+    return from(shovel, t + 0.01, P);
+  }
+  // боб-енд-вівер уліво → крос нагорі «U» (Arsenal 110)
+  function bobcross(t, P) {
+    t = bob(t, P, true);
+    t = from(crossSolo, t + 0.01, P);
+    return retreat(t + 0.06, P + 0.08, P);
+  }
   // ----- обманки -----
   const OF = { L: [0.40, 1.48, 0.04], R: [0.44, 1.49, -0.08] };                // суперник смикнувся: руки до обличчя
   // фінт плечем → джеб: рухаються лише плече й стегно, рука стоїть (Arsenal 179)
@@ -736,6 +768,21 @@ function buildSeries(name) {
     add(t + 0.04, guard(P + 0.11, { opp: OG, say: "Відновлення." })); t += 0.04;
     return retreat(t + 0.06, P + 0.11, P);
   }
+  // фейк ногою → прямий: коліно вгору тягне його руки вниз, удар — угорі (Arsenal 196)
+  const OL = { L: [0.44, 1.16, 0.05], R: [0.47, 1.18, -0.10] };               // суперник опустив руки, захищаючи корпус
+  function fakekj(t, P) {
+    add(t, guard(P, { opp: OG, say: "Обманка: фейк ногою, удар рукою. Arsenal 196" }));
+    add(t + 0.04, at(P, { hip: 58, chest: 52, rk: GUARD_R, lk: GUARD_L, rf: { heel: 30 }, opp: OG,
+      ff: { x: P + 0.30, y: 0.28, z: 0.10, yaw: 10, pitch: -30, kp: [1, 0.3, 0] },
+      say: "Фейк: коліно передньої вгору, як на справжній кік. Його увага — вниз. Arsenal 179" }));
+    add(t + 0.075, at(P, { hip: 54, chest: 52, rk: GUARD_R, lk: GUARD_L, rf: { heel: 30 }, opp: OL, tag: "фейк · він опустив руки",
+      ff: { x: P + 0.30, y: 0.06, z: ST.fz, yaw: ST.fyaw, pitch: 0, kp: null },
+      say: "Він опустив руки — голова відкрита. Arsenal 196" }));
+    t = jab(t + 0.085, P, "Прямий передньою одразу, поки нога ще опускається. Arsenal 196");
+    add(t + 0.04, at(P, { px: P + 0.12, ff: { x: P + 0.43 }, rk: GUARD_R, lk: GUARD_L, opp: OG }));
+    t = settle(t + 0.08, P + 0.11, "Задня нога підтягується.");
+    return retreat(t + 0.05, P + 0.11, P);
+  }
   // фейк прямим угорі → хук-кік: улюблене Брюса Лі (Arsenal 179, 195)
   function fakejk(t, P) {
     add(t, guard(P, { opp: OG, say: "Обманка: фейк прямим угорі, удар ногою. Улюблене Брюса Лі. Arsenal 179, 195" }));
@@ -759,9 +806,9 @@ function buildSeries(name) {
   if (name === "slipr") {
     t = slipR(t, SLIP_P);
   } else if (EVADE.includes(name)) {
-    t = { slipl: slipL, duck, snap, weave, roll, bob, side, snapjab, dblj, weavehook }[name](t, SLIP_P);
+    t = { slipl: slipL, duck, snap, weave, roll, bob, side, snapjab, dblj, weavehook, pivot, duckup, duckshov, bobcross }[name](t, ["duckup", "duckshov"].includes(name) ? CLOSE + 0.16 : SLIP_P);
   } else if (FEINT.includes(name)) {
-    t = { feint, fakejc, fakejk }[name](t, S);
+    t = { feint, fakejc, fakejk, fakekj }[name](t, S);
   } else if (name === "pak" || name === "lap" || name === "jao") {
     t = name === "pak" ? oppPunch(t, TRAP_P) : crossHand(t, TRAP_P);
     t = { pak, lap, jao }[name](t, TRAP_P);
