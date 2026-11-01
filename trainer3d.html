@@ -940,28 +940,38 @@ const cl01 = v => Math.min(1, Math.max(0, v));
 const hsm = (e0, e1, x) => { const t = cl01((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
 const HEAD = { rx: 0.095, ry: 0.115, rz: 0.078, jaw: 0.36, brow: 0.006, socket: 0.006, nose: 0.019, noseW: 0.0085, cheek: 0.004, lipV: 0.0035, chin: 0.009,
   skin: "#dcae86", lip: "#b5705c", blush: "#d98a70", blushK: 0.25,
-  eyeR: 0.0118, irisA: 0.62, lidA: 1.2, lidTilt: 0.32, browT: 0.0026, iris: 0x3b2414 };
+  eyeR: 0.0118, irisA: 0.62, lidA: 1.2, lidTilt: 0.32, browT: 0.0026, iris: 0x3b2414,
+  // додаткові риси (0 = як у базовій голові)
+  jawSq: 0, jawLong: 0, hollow: 0, muzzle: 0, wing: 0.25, wingZ: 0.011, bridge: 0, lipW: 0.019, chinW: 0.024, frown: 0,
+  lowA: 0, lowTilt: 0.25, slant: 0, browPts: [[0.03, 0.012], [0.037, 0.034], [0.034, 0.052]], pomp: 0, hairC: 0x18120e };
+// обличчя-типаж «чуб» (обрано 2026-11-01 з drafts/lessons_chat/face_variants/, варіант H)
+Object.assign(HEAD, { rx: 0.095, ry: 0.112, rz: 0.077, jaw: 0.3, jawLong: 0.03, jawSq: 0.14, cheek: 0.011, hollow: 0.004, nose: 0.012, noseW: 0.012, wing: 0.6, wingZ: 0.015, bridge: 0.55, muzzle: 0.006, lipV: 0.0045, lipW: 0.02, chin: 0.012, chinW: 0.027, frown: 0.002, brow: 0.008, lidA: 1.25, lidTilt: 0.45, lowA: 0.5, lowTilt: 0.15, slant: 0.12, browT: 0.0036, browPts: [[0.024, 0.01], [0.032, 0.03], [0.04, 0.05]], skin: "#c99c7c", blushK: 0, hairBruce: true, hairC: 0x0c0907 });
+if (HEAD.hairBruce) M.skin.color.set(HEAD.skin);   // шия й руки того ж кольору, що й обличчя
 function sculptHead(P) {
   const geo = new THREE.SphereGeometry(1, 112, 84), pos = geo.attributes.position, col = new Float32Array(pos.count * 3);
   const skin = new THREE.Color(P.skin), lip = new THREE.Color(P.lip), shade = new THREE.Color(P.skin).multiplyScalar(0.8), blush = new THREE.Color(P.blush), c = new THREE.Color();
   for (let i = 0; i < pos.count; i++) {
     let x = pos.getX(i) * P.rx, y = pos.getY(i) * P.ry, z = pos.getZ(i) * P.rz;
-    if (y < 0) { const t = cl01(-y / P.ry); z *= 1 - P.jaw * t * t; x *= x < 0 ? 1 - 0.3 * t : 1 - 0.12 * t * t; }   // вужча щелепа
+    if (y < 0) { const t = cl01(-y / P.ry); z *= 1 - P.jaw * t * t; x *= x < 0 ? 1 - 0.3 * t : 1 - 0.12 * t * t; y *= 1 + P.jawLong * t * t; }   // вужча (довша) щелепа
+    z *= 1 + P.jawSq * gau(y + 0.075, 0.02) * hsm(-0.05, 0.0, x) * (1 - hsm(0.03, 0.07, x));                     // кути щелепи: ширше під вухами
     const front = hsm(0, 0.06, x), az = Math.abs(z);
     let d = 0;
     d += P.brow * front * gau(y - 0.03, 0.011) * gau(z, 0.045);                                                // надбрів'я
+    d -= P.frown * front * gau(z, 0.006) * gau(y - 0.022, 0.008);                                              // складка між бровами
     d -= P.socket * front * gau(y - 0.012, 0.011) * (gau(z - 0.033, 0.015) + gau(z + 0.033, 0.015));           // очниці
-    const nose = y > -0.034 ? Math.pow(cl01((0.018 - y) / 0.052), 1.4) : gau(y + 0.034, 0.01);
-    d += P.nose * front * gau(z, P.noseW) * nose;                                                              // ніс
-    d += 0.25 * P.nose * front * gau(az - 0.011, 0.007) * gau(y + 0.036, 0.009);                               // крила носа
+    const nose = y > -0.034 ? Math.pow(cl01((0.018 - y) / 0.052), 1.4) * (1 - P.bridge * gau(y - 0.0, 0.014)) : gau(y + 0.034, 0.01);
+    d += P.nose * front * gau(z, P.noseW) * nose;                                                              // ніс (bridge: нижче перенісся)
+    d += P.wing * P.nose * front * gau(az - P.wingZ, 0.007) * gau(y + 0.036, 0.009);                           // крила носа
     d += P.cheek * gau(y + 0.01, 0.018) * gau(az - 0.05, 0.016) * hsm(-0.02, 0.04, x);                         // вилиці
+    d -= P.hollow * gau(y + 0.045, 0.014) * gau(az - 0.052, 0.013) * hsm(-0.01, 0.04, x);                      // запалі щоки під вилицями
+    d += P.muzzle * front * gau(z, 0.032) * gau(y + 0.062, 0.02);                                                 // рот і губи виступають уперед
     d -= 0.0025 * front * gau(z, 0.028) * gau(y + 0.061, 0.0035);                                              // щілина рота
-    d += P.lipV * front * gau(z, 0.019) * (gau(y + 0.056, 0.0045) + 1.2 * gau(y + 0.067, 0.005));              // губи
-    d += P.chin * front * gau(z, 0.024) * gau(y + 0.098, 0.014);                                               // підборіддя
+    d += P.lipV * front * gau(z, P.lipW) * (gau(y + 0.056, 0.0045) + 1.2 * gau(y + 0.067, 0.005));             // губи
+    d += P.chin * front * gau(z, P.chinW) * gau(y + 0.098, 0.014);                                             // підборіддя
     const n = V(x, y, z).normalize();
     pos.setXYZ(i, x + n.x * d, y + n.y * d, z + n.z * d);
     c.copy(skin);                                                                                              // колір: губи, тінь очниць, рум'янець
-    c.lerp(lip, cl01(1.1 * front * gau(z, 0.019) * Math.max(gau(y + 0.056, 0.005), gau(y + 0.067, 0.006))));
+    c.lerp(lip, cl01(1.1 * front * gau(z, P.lipW) *Math.max(gau(y + 0.056, 0.005), gau(y + 0.067, 0.006))));
     c.lerp(shade, cl01(0.6 * front * gau(y - 0.014, 0.012) * (gau(z - 0.033, 0.02) + gau(z + 0.033, 0.02))));
     c.lerp(blush, cl01(P.blushK * gau(y + 0.02, 0.016) * gau(az - 0.05, 0.014) * hsm(0, 0.04, x)));
     col.set([c.r, c.g, c.b], i * 3);
@@ -982,9 +992,39 @@ function hairGeo(P, vol) {
     f += vol * 0.012 * Math.sin(az * 37 + polar * 9) * hsm(0.2, 0.6, polar) * edge;
     f += vol * 0.06 * gau(polar, 0.5);
     f += vol * 0.07 * gau(polar - 1.15, 0.22) * gau(az, 0.5);
+    f += P.pomp * gau(polar - 0.75, 0.3) * gau(az, 0.7) * edge;                                                // чуб над лобом
     f -= 0.035 * gau(uz + 0.38, 0.05) * hsm(0.2, 0.5, polar) * (1 - hsm(1.0, 1.3, polar));                    // проділ
     const x = ux * f, y = uy * f, z = uz * f;
     pos.setXYZ(i, (x * ca - y * sa) * P.rx, (x * sa + y * ca) * P.ry + 0.006, z * P.rz);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+// зачіска «чуб»: густе волосся з чубчиком на лобі, бакенбардами й низькою потилицею (?face=H)
+// лінія росту волосся за кутом навколо голови (0: лоб, π/2: вухо, π: потилиця); нижче лінії сфера ховається в голову
+const HAIRLINE = [[0, 0.052], [0.45, 0.05], [0.85, 0.032], [1.15, -0.03], [1.38, -0.03], [1.5, 0.018], [1.95, 0.018], [2.3, -0.075], [Math.PI, -0.08]];
+function hairLineY(a) {
+  for (let i = 1; i < HAIRLINE.length; i++) if (a <= HAIRLINE[i][0]) {
+    const [a0, y0] = HAIRLINE[i - 1], [a1, y1] = HAIRLINE[i], t = (a - a0) / (a1 - a0);
+    return y0 + (y1 - y0) * t * t * (3 - 2 * t);
+  }
+  return HAIRLINE[HAIRLINE.length - 1][1];
+}
+function hairBruce(P) {
+  const geo = new THREE.SphereGeometry(1, 128, 96), pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const ux = pos.getX(i), uy = pos.getY(i), uz = pos.getZ(i);
+    let x = ux * P.rx, y = uy * P.ry, z = uz * P.rz;
+    if (y < 0) { const t = cl01(-y / P.ry); z *= 1 - P.jaw * t * t; x *= x < 0 ? 1 - 0.3 * t : 1 - 0.12 * t * t; }   // як у sculptHead
+    const az = Math.atan2(Math.abs(uz), ux), front = gau(az, 0.6);
+    const line = hairLineY(az) + 0.004 * Math.sin(az * 46 + uz * 30);                                       // нерівний край пасом
+    const k = hsm(line - 0.002, line + 0.006, y);                                                            // 0: шкіра, 1: волосся
+    const top = hsm(-0.02, 0.09, y);
+    const v = P.hairVol ?? 1;                                                                                // 1: об'ємна, 0: прилизаніша
+    let f = 1 + k * (0.035 + 0.015 * v + (0.11 + 0.06 * v) * top + (0.05 + 0.02 * v) * front * hsm(0.03, 0.08, y));                                // об'єм: маківка й чуб
+    f += k * 0.012 * Math.pow(0.5 + 0.5 * Math.sin(az * 28 + uy * 9), 2);                                     // пасма
+    if (k < 0.02) f = 0.96;
+    pos.setXYZ(i, x * f + (k > 0.02 ? 0.006 * front * k : 0), y * f + 0.004 * k, z * f);
   }
   geo.computeVertexNormals();
   return geo;
@@ -1000,8 +1040,8 @@ function buildHead(g, P) {
     return h ? h.point.clone().add(h.face.normal.clone().multiplyScalar(off)) : V(0.08, y, z); };
   const earM = std(new THREE.Color(P.skin).multiplyScalar(0.94)), earIn = std(new THREE.Color(P.skin).multiplyScalar(0.86));
   [-1, 1].forEach(s => {                                                                                       // вуха
-    piece(g, new THREE.SphereGeometry(1, 20, 14), earM, [-0.008, -0.004, s * P.rz * 0.96], [0.02, 0.029, 0.008]);
-    piece(g, new THREE.SphereGeometry(1, 14, 10), earIn, [-0.004, -0.004, s * (P.rz * 0.96 + 0.0055)], [0.009, 0.015, 0.004]);
+    piece(g, new THREE.SphereGeometry(1, 20, 14), earM, [-0.01, -0.004, s * P.rz * 0.97], [0.016, 0.026, 0.0045], [0, 0, 0.25]);
+    piece(g, new THREE.SphereGeometry(1, 14, 10), earIn, [-0.008, -0.002, s * (P.rz * 0.97 + 0.0035)], [0.009, 0.016, 0.0025], [0, 0, 0.25]);
   });
   // очі: яблуко, райдужка й зіниця, «шапочки», верхня повіка зі смужкою вій
   const white = std(0xefe9e2, { roughness: 0.25 }), iris = std(P.iris, { roughness: 0.2 }), pupil = std(0x0b0705, { roughness: 0.15 });
@@ -1011,15 +1051,19 @@ function buildHead(g, P) {
     piece(g, new THREE.SphereGeometry(r, 28, 18), white, c.toArray());
     const cap = (rr, th, m) => piece(g, new THREE.SphereGeometry(rr, 28, 8, 0, Math.PI * 2, 0, th), m, c.toArray(), [1, 1, 1], [0, 0, -Math.PI / 2]);
     cap(r * 1.004, P.irisA, iris); cap(r * 1.008, P.irisA * 0.45, pupil);
-    const lidG = new THREE.Group(); lidG.position.copy(c); lidG.rotation.z = -P.lidTilt; g.add(lidG);
+    const lidG = new THREE.Group(); lidG.position.copy(c); lidG.rotation.set(-s * P.slant, 0, -P.lidTilt); g.add(lidG);
     const R = r * 1.1, th = P.lidA;
     piece(lidG, new THREE.SphereGeometry(R, 28, 14, 0, Math.PI * 2, 0, th), lidM, [0, 0, 0]);
     const tg = new THREE.TorusGeometry(R * Math.sin(th), r * 0.11, 6, 28, Math.PI); tg.rotateZ(-Math.PI / 2); tg.rotateX(Math.PI / 2);
     piece(lidG, tg, lash, [0, R * Math.cos(th), 0]);
+    if (P.lowA > 0) {                                                                                          // нижня повіка: вужче око
+      const lowG = new THREE.Group(); lowG.position.copy(c); lowG.rotation.set(s * P.slant, 0, Math.PI + P.lowTilt); g.add(lowG);
+      piece(lowG, new THREE.SphereGeometry(r * 1.06, 28, 10, 0, Math.PI * 2, 0, P.lowA), lidM, [0, 0, 0]);
+    }
   });
   const browM = std(0x17110d);                                                                                 // брови
   [-1, 1].forEach(s => {
-    const pts = [[0.03, 0.012], [0.037, 0.034], [0.034, 0.052]].map(([y, z]) => surf(y, z * s, 0.0015));
+    const pts = P.browPts.map(([y, z]) => surf(y, z * s, 0.0015));
     piece(g, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 16, P.browT, 8, false), browM, [0, 0, 0]);
   });
   const mpts = [-0.019, -0.009, 0, 0.009, 0.019].map(z => surf(-0.0615 + (Math.abs(z) > 0.015 ? 0.0012 : 0), z, 0.0004));
@@ -1030,7 +1074,7 @@ function buildHead(g, P) {
   mouthHole = new THREE.Group(); mouthHole.visible = false; g.add(mouthHole);
   piece(mouthHole, new THREE.SphereGeometry(1, 24, 16), std(0x3a0d0d, { roughness: 0.9 }), [0, 0, 0], [0.0075, 0.5, 0.0165]);
   piece(mouthHole, new THREE.BoxGeometry(1, 1, 1), white, [0.0025, 0.4, 0], [0.004, 0.14, 0.022]);            // верхні зуби
-  piece(g, hairGeo(P, 1), std(0x18120e, { roughness: 0.5 }), [0, 0, 0]);                                       // волосся
+  piece(g, P.hairBruce ? hairBruce(P) : hairGeo(P, 1), std(P.hairC, { roughness: 0.5 }), [0, 0, 0]);                                    // волосся
   setMouth(0);
 }
 function setMouth(o) {
