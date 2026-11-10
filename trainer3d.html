@@ -42,7 +42,7 @@
 <body>
 <header><h1>3D-тренер JKD за книгами</h1><span>Миша: ліва кнопка обертає, колесо змінює масштаб. Помаранчеві рукавиці й взуття: права (передня) сторона, сині: ліва (задня).</span></header>
 <main>
-  <div id="view"><div id="tag"></div><div id="phase"></div></div>
+  <div id="view"><div id="tag"></div><div id="phase"></div><div id="ms" style="position:absolute;right:8px;top:6px;font:12px/1.2 monospace;color:#ffd23f;background:#0008;padding:3px 6px;border-radius:4px;display:none"></div></div>
   <aside>
     <h2>Ціль</h2>
     <div class="row">
@@ -105,7 +105,7 @@ const TRAPS = ["pak", "lap", "jao", "jut"];                                    /
 const EVADE = ["slipr", "slipl", "duck", "snap", "weave", "roll", "bob", "side", "snapjab", "dblj", "weavehook", "pivot", "duckup", "duckshov", "bobcross"];   // увороти й комбінації з ними
 const FEINT = ["feint", "fakejc", "fakejk", "fakekj"];                                       // обманки (Arsenal 178–179, 195–196)                                                          // увороти (Arsenal, гл. 9)
 const HANDS = ["cross", "bfist", "cork", "shovel", "upper", "rupper", ...TRAPS, ...EVADE, ...FEINT];                 // окремі удари руками (buildSeries)
-const LESSON = [...HANDS, "hookkick", "steps", "steps2", "stepstrike", "guard", "vid2", ...SERIES].includes(QS.get("lesson")) ? QS.get("lesson") : "combo";
+const LESSON = (l => l === "vid1" ? "vid2" : l)([...HANDS, "hookkick", "steps", "steps2", "stepstrike", "guard", "vid2", ...SERIES].includes(QS.get("lesson")) ? QS.get("lesson") : "combo");   // vid1 (стара ручна версія) замінено на vid2 (оцифроване відео)
 if (QS.has("embed")) document.body.classList.add("embed");
 if (QS.has("hero")) document.body.classList.add("hero");
 // лівша (передня: ліва рука й нога): дзеркалимо картинку
@@ -2060,7 +2060,12 @@ $("steps").innerHTML = keys.filter(k => k.say).map(k => `<li data-t="${k.t}">${k
 $("time").max = END;
 function restart() { T = 0; headReset(); trails.R.pts = []; trails.L.pts = []; }
 $("play").onclick = () => { audioOn(); playing = !playing; $("play").textContent = playing ? "⏸ Пауза" : "▶ Пуск"; };
-addEventListener("keydown", e => { if (e.code === "Space" && !/INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)) { e.preventDefault(); $("play").click(); } });   // пробіл = пауза / пуск
+addEventListener("keydown", e => { if (LESSON === "vid2" && (e.code === "ArrowLeft" || e.code === "ArrowRight") && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) {   // ←/→: 1 кадр відео (33 мс); Shift: 1 мс; Alt: 10 мс
+    e.preventDefault(); playing = false; $("play").textContent = "▶ Пуск";
+    const ms = e.shiftKey ? 1 : e.altKey ? 10 : 1000 / 30;   // крок у мс відео (30 кадрів/с)
+    T = Math.max(0, Math.min(END, T + (e.code === "ArrowRight" ? 1 : -1) * ms / 2000)); headReset(); return;
+  }
+  if (e.code === "Space" && !/INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)) { e.preventDefault(); $("play").click(); } });   // пробіл = пауза / пуск
 $("restart").onclick = () => { audioOn(); restart(); playing = true; $("play").textContent = "⏸ Пауза"; };
 $("loop").onclick = () => { loop = !loop; $("loop").classList.toggle("on", loop); };
 $("spd").oninput = e => $("spdv").textContent = (+e.target.value).toFixed(2) + "×";
@@ -2187,6 +2192,7 @@ function frameLoop() {
   const mo = kiaiT > 0 ? Math.min(1, kiaiT / 0.1, (0.55 - kiaiT) / 0.04 + 0.2) : 0;
   setMouth(mo);
   $("time").value = T;
+  if (LESSON === "vid2") { const e = $("ms"); e.style.display = "block"; e.textContent = Math.round(T * 2000) + " мс · кадр " + (T * 60).toFixed(1); }   // час відео в мілісекундах
   let cur = null; document.querySelectorAll("#steps li").forEach(li => { if (+li.dataset.t <= T + 1e-6) cur = li; });
   document.querySelectorAll("#steps li").forEach(li => li.classList.toggle("cur", li === cur));
   $("phase").textContent = cur ? cur.textContent : "";
