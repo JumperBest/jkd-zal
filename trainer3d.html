@@ -99,7 +99,7 @@ const HEAD0 = V(0.57, 1.50, -0.05), HEAD_R = 0.105;           // голова с
 const onHead = (x, y, z) => HEAD0.clone().add(V(x, y, z).normalize().multiplyScalar(HEAD_R));
 const CHIN = onHead(-0.85, -0.5, 0);                            // підборіддя, ціль прямих
 const JAW = onHead(-0.5, -0.45, 0.74);                          // лівий бік щелепи суперника, ціль хука
-const SERIES = ["c12", "c123", "ckp", "cpk", "ckc"];                 // топ-5 комбінацій з книг (Arsenal 161–188)
+const SERIES = ["c12", "c123", "ckp", "cpk", "ckc", "vid1"];                 // топ-5 комбінацій з книг (Arsenal 161–188)
 const QS = new URLSearchParams(location.search);
 const TRAPS = ["pak", "lap", "jao", "jut"];                                    // траппінг (Cheung/Wong)
 const EVADE = ["slipr", "slipl", "duck", "snap", "weave", "roll", "bob", "side", "snapjab", "dblj", "weavehook", "pivot", "duckup", "duckshov", "bobcross"];   // увороти й комбінації з ними
@@ -322,6 +322,64 @@ function buildSeries(name) {
     add(t + 0.06, at(P, { px: P + 0.07, py: 0.955, hip: 78, chest: 82, lean: 0.07, ff: { x: P + 0.42, lift: 0.012 }, rf: { heel: 32 }, rk: chin(0), tag: "прямий · підборіддя", kiai }));
     add(t + 0.075, at(P, { px: P + 0.09, py: 0.94, hip: 82, chest: 86, lean: 0.08, ff: { x: P + 0.43 }, rf: { heel: 42 }, rk: chin(0.06) }));
     return t + 0.075;
+  }
+  // низький удар передньою ногою по гомілці/коліну (з відео IMG_2258; у книгах окремого опису немає, пози підібрані за кадрами)
+  function lowKick(t, P, say) {
+    add(t, at(P, { hip: 55, chest: 52, rk: GUARD_R, lk: GUARD_L, say }));
+    add(t + 0.05, at(P, { px: P + 0.02, py: 0.95, hip: 62, chest: 56, lb: 0.03, rk: GUARD_R, lk: GUARD_L,
+      ff: { x: 0.05, y: 0.30, z: 0.12, yaw: -95, pitch: -40, kp: [1, 0.4, 0.2] }, rf: { x: P - 0.30, yaw: 80, heel: 15 }, say: "Коліно трохи вгору й всередину: нога заряджена." }));
+    add(t + 0.095, at(P, { px: P, py: 0.96, hip: 90, chest: 80, lb: 0.08, rk: GUARD_R, lk: GUARD_L, kiai: true, tag: "низький кік · гомілка",
+      ff: { x: 0.56, y: 0.30, z: 0.06, yaw: -10, pitch: 15, kp: [0.4, 0.5, -1] }, rf: { x: P - 0.30, yaw: 120, heel: 8 }, say: "Удар у гомілку чи коліно: нога майже пряма, корпус рівний." }));
+    add(t + 0.12, at(P, { px: P, py: 0.96, hip: 92, chest: 82, lb: 0.08, rk: GUARD_R, lk: GUARD_L,
+      ff: { x: 0.46, y: 0.30, z: 0.06, yaw: -10, pitch: 15, kp: [0.4, 0.5, -1] }, rf: { x: P - 0.30, yaw: 120, heel: 8 } }));
+    add(t + 0.18, at(P, { px: P, hip: 70, chest: 62, rk: GUARD_R, lk: GUARD_L,
+      ff: { x: 0.10, y: 0.25, z: 0.12, yaw: -90, pitch: -30, kp: [1, 0.4, 0.2] }, rf: { x: P - 0.30, yaw: 90, heel: 12 } }));
+    add(t + 0.25, guard(P, { ff: { y: 0, z: ST.fz, yaw: ST.fyaw, pitch: 0, lift: 0.03, kp: null } }));
+    add(t + 0.30, guard(P, { ff: { kp: null } }));
+    return t + 0.30;
+  }
+  // високий прямий удар ногою (на відео IMG_2258: нога пряма на рівні голови, корпус відхилений назад, задня рука вниз). Тип назвіть самі: сайд-кік чи інший.
+  function sideKick(t, P, say, adv = 0) {
+    const RX = -0.46 + adv;                                                   // опорна (задня) стопа підтягнута під таз: нога стоїть прямо, як на відео
+    const back = { w: [-0.84 + adv, 0.96, 0.05], pole: [0, -1, -0.3], roll: 0, open: 1, noShift: true };       // дальня рука: вниз і назад від цілі (у світових осях)   // задня рука вниз-назад, долоня відкрита
+    const fwd = { tgt: [0.50, 0.10, -0.03], pole: [0, -1, 0.3], roll: 0, open: 1 };
+    // руки з відео (кадри 28–36): відкриті долоні схрещені перед грудьми → розходяться: передня вперед, дальня різко вниз-назад (долоня вниз)
+    const xR = { loc: [0.20, -0.04, -0.13], pole: [0, -1, 0.4], roll: 0, open: 1 }, xL = { loc: [0.22, 0.02, 0.13], pole: [0, -1, -0.4], roll: 0, open: 1 };
+    const midR = { tgt: [0.40, 0.04, -0.04], pole: [0, -1, 0.3], roll: 0, open: 1 }, midL = { w: [-0.62 + adv, 1.12, 0.08], pole: [0, -1, -0.4], roll: 0, open: 1, noShift: true };      // передня рука витягнута вперед до цілі, як баланс
+    add(t, at(P, { wp: "ch", px: -0.38 + adv, py: 0.97, hip: 80, chest: 60, lb: 0.05, rk: xR, lk: xL,
+      ff: { x: 0.0 + adv * 0, y: 0.62, z: 0.10, yaw: 90, pitch: 0, kp: [1, 0.9, 0.15] }, rf: { x: RX, yaw: 140, heel: 8 }, say: say }));   // замах: коліно вгору до тулуба, гомілка підібрана, стопа паралельно підлозі, п'ята до таза
+    add(t + 0.06, at(P, { px: -0.40 + adv, py: 0.99, hip: 100, chest: 85, lb: 0.18, rk: midR, lk: midL,
+      ff: { x: 0.34, y: 0.92, z: 0.08, yaw: 92, pitch: -5, kp: [0.5, 0.9, 0.35] }, rf: { x: RX, yaw: 160, heel: 4 } }));
+    add(t + 0.10, at(P, { px: -0.42 + adv, py: 1.0, hip: 110, chest: 95, lb: 0.30, kiai: true, tag: "високий кік · корпус/голова", rk: fwd, lk: back,
+      ff: { x: 0.52, y: 1.12, z: 0.0, yaw: 90, pitch: 0, kp: [0.2, 0.7, 0.7] }, rf: { x: RX, yaw: 165, heel: 3 },
+      say: "Нога пряма на рівні корпусу–голови; опорна нога пряма під тазом; корпус відхилений назад; передня рука вперед, задня вниз." }));
+    add(t + 0.14, at(P, { px: -0.42 + adv, py: 1.0, hip: 110, chest: 95, lb: 0.30, rk: fwd, lk: back,   // нога тримається в ударі (на відео ~0.4 с)
+      ff: { x: 0.51, y: 1.11, z: 0.0, yaw: 90, pitch: 0, kp: [0.2, 0.7, 0.7] }, rf: { x: RX, yaw: 165, heel: 3 } }));
+    add(t + 0.18, at(P, { px: -0.42 + adv, py: 1.0, hip: 110, chest: 95, lb: 0.30, rk: fwd, lk: back,
+      ff: { x: 0.50, y: 1.10, z: 0.0, yaw: 90, pitch: 0, kp: [0.2, 0.7, 0.7] }, rf: { x: RX, yaw: 165, heel: 3 } }));
+    add(t + 0.28, at(P, { px: -0.41 + adv, py: 0.97, hip: 90, chest: 80, lb: 0.1, rk: GUARD_R, lk: GUARD_L,
+      ff: { x: 0.02, y: 0.62, z: 0.10, yaw: 90, pitch: 0, kp: [1, 0.9, 0.15] }, rf: { x: RX, yaw: 120, heel: 5 }, say: "Нога повертається: коліно вниз." }));
+    add(t + 0.36, at(-0.40 + adv, { hip: 60, chest: 55, lb: 0.02, rk: GUARD_R, lk: GUARD_L, ff: { y: 0, z: ST.fz, yaw: ST.fyaw, pitch: 0, lift: 0.04, kp: null }, rf: { x: RX, yaw: 60, heel: 20 } }));
+    add(t + 0.42, at(-0.40 + adv, { ff: { kp: null }, rf: { x: RX, yaw: 45, heel: ST.rheel } }));
+    return t + 0.42;
+  }
+  // push step вперед: задня нога штовхає, передня їде слідом, під кінець задня стопа підтягується під таз (підшаг перед ударом ногою); Arsenal 52, 58
+  function pushFwd(t, P0, P1, say) {
+    add(t, guard(P0, { say }));
+    add(t + 0.04, at(P0, { px: (P0 + P1) / 2, py: 0.93, rk: GUARD_R, lk: GUARD_L, ff: { x: (P0 + P1) / 2 + 0.34, lift: 0.025 }, rf: { x: (P0 + P1) / 2 - 0.30, lift: 0.03, heel: 35 } }));
+    add(t + 0.08, at(P1, { rk: GUARD_R, lk: GUARD_L, rf: { x: P1 - 0.06 } }));
+    return t + 0.08;
+  }
+  // відхід назад двома кроками (step and slide назад): задня нога перша, передня слідом (Arsenal 51–52); кожен крок d м
+  function stepBack(t, P0, P1, say) {
+    const n = 2, d = (P0 - P1) / n, L = 0.11;
+    for (let i = 0; i < n; i++) {
+      const A = P0 - d * i, B = A - d, t0 = t + i * L;
+      add(t0 + 0.03, at(A, { px: A - d * 0.4, py: 0.94, rk: GUARD_R, lk: GUARD_L, ff: { x: A + 0.32 }, rf: { x: B - 0.30, lift: 0.03, heel: 30 }, say: i === 0 ? say : undefined }));
+      add(t0 + 0.065, at(A, { px: B + d * 0.3, rk: GUARD_R, lk: GUARD_L, ff: { x: B + 0.32, lift: 0.03 }, rf: { x: B - 0.30, lift: 0 } }));
+      add(t0 + L, guard(B));
+    }
+    return t + n * L;
   }
   function settle(t, P, say) {                                              // задня нога підтягується, руки в стійку
     add(t + 0.03, at(P, { rf: { x: P - 0.35, lift: 0.02 }, rk: GUARD_R, lk: GUARD_L, say }));
@@ -845,6 +903,13 @@ function buildSeries(name) {
     add(t + 0.13, at(-0.24, { px: -0.26, lean: 0.07, rk: chin(0.10), ff: { x: 0.06 }, rf: { x: -0.50, heel: 40 } }));
     t = settle(t + 0.13, -0.24, "Задня нога підтягується: стійка.");
     t = retreat(t + 0.05, -0.24, S);
+  } else if (name === "vid1") {
+    t = lowKick(t, S, "1. Низький удар передньою ногою по гомілці. Відео IMG_2258");
+    t = jab(t + 0.02, S, "2. Джеб передньою, відразу після ноги.");
+    t = hook(t + 0.04, S + 0.11, "3. Боковий (хук) передньою: рука збоку по дузі, розворот стоп.");
+    t = pushFwd(t + 0.02, S + 0.11, S + 0.24, "4. Push step вперед: задня нога штовхає, партнер відійшов, дистанцію відновлюємо.");
+    t = sideKick(t + 0.04, S, "5. Високий удар тією ж передньою ногою: нога пряма, корпус назад (як на відео).", 0.24);
+    t = stepBack(t + 0.02, S + 0.24, S, "6. Відхід назад двома кроками: задня нога перша, передня слідом. Arsenal 51–52");
   } else if (name === "cpk") {
     t = straight(t, -0.37, "Прямий передньою з підшагом. Arsenal 163", false);
     t = kick(t + 0.02, -0.26, { pre: 0.07, say: "Рука назад, і цим рухом нога вгору: центр ваги йде назад. Arsenal 163" });
@@ -859,11 +924,13 @@ function buildSeries(name) {
   if (EVADE.includes(name)) {                                                // увороти: ноги лишаються там, де стали, без повернення на старт
     const last = ks[ks.length - 1];
     for (const dt of [0.2, 0.45]) { const k = JSON.parse(JSON.stringify(last)); delete k.say; delete k.tag; k.t = t + dt; ks.push(k); }
+  } else if (name === "vid1") {
+    add(t + 0.04);                                                           // урок з відео: без довгого «хвоста» в кінці
   } else {
     add(t + 0.2);
     add(t + 0.45);
   }
-  return ks;
+  return name === "vid1" ? applyPartner(warpVid(ks)) : ks;
 }
 
 // ---------- кроки в стійці: тільки ноги, руки весь час on guard (Arsenal, гл. 3; Straight Lead, гл. 5) ----------
@@ -1609,15 +1676,43 @@ function springSphere(o) {
   return o;
 }
 
+// зсув партнера по x (кроки назад/вперед). Лише в уроці vid1 (рух партнера з відео IMG_2258); в інших = 0
+let ODX = 0;
+function PD(t) {   // партнер: після ударів рукою відходить, боєць доганяє push-кроком вперед, після удару ногою партнер відлітає
+  return 0.36 * smooth(0.42, 0.53, t) + 0.28 * smooth(0.62, 0.82, t) - 0.64 * smooth(0.98, 1.2, t);
+}
+// удари бійця націлені в голову/ногу партнера: зсуваємо ціль разом із ним (кожному ключу свій зсув)
+function applyPartner(ks) {
+  for (const k of ks) {
+    const dx = PD(k.t);
+    for (const h of [k.rk, k.lk]) if (h && h.w && !h.noShift) h.w = [h.w[0] + dx, h.w[1], h.w[2]];
+    if (k.ff && k.ff.y > 0.2 && k.ff.x != null) k.ff.x += Math.min(dx, 0.24);      // нога не «росте» за партнером: він відходить далі, ніж вона дістає (як на відео)
+  }
+  return ks;
+}
+// час уроку vid1 як на відео IMG_2258: удари (с відео / 2, бо «1×» = 2 с моделі): низький кік 0.10, джеб 0.25, боковий 0.40, високий кік 0.60;
+// після удару ногою нога тримається ~0.2, далі повернення. Ключі між ударами розтягуються/стискаються за цими опорами.
+function warpVid(ks) {
+  const tg = ks.filter(k => k.tag).map(k => k.t), ch = ks.find(k => k.wp === "ch").t;
+  const from = [0, tg[0], tg[1], tg[2], ch, tg[3]], to = [0, 0.10, 0.25, 0.40, 0.50, 0.60];   // «замах» ногою 0.10 моделі = 0.2 с відео
+  for (const k of ks) {
+    let t = k.t;
+    if (t <= from[1]) t = t * to[1] / from[1];
+    else if (t >= from[5]) { const d = t - from[5]; t = to[5] + (d <= 0.08 ? d * 2.0 : 0.16 + (d - 0.08) * 0.9); }
+    else for (let i = 1; i < 5; i++) if (t <= from[i + 1]) { t = to[i] + (t - from[i]) / (from[i + 1] - from[i]) * (to[i + 1] - to[i]); break; }
+    k.t = t;
+  }
+  return ks;
+}
 // суперник: голова на пружній шиї
 const TG = {};
 TG.opp = springSphere({ name: "Суперник", R: HEAD_R, M: 5, K: 900, C: 45, I: 0.03, RK: 55, RC: 2.4, KC: 6000, DC: 90, MU: 0.4, sink: 0.01,
-  base: () => HEAD0.clone(),
+  base: () => HEAD0.clone().add(V(ODX, 0, 0)),
   show(on) { opp.torso.visible = opp.head.visible = oNeckMesh.visible = on; marks.chin.visible = marks.jaw.visible = on; },
   draw() {
     const st = TG.opp.st;
     opp.head.position.copy(TG.opp.center()); opp.head.quaternion.copy(qFromRot(st.rot));
-    opp.torso.position.copy(st.d).multiplyScalar(0.25);                          // корпус трохи йде за головою
+    opp.torso.position.copy(st.d).multiplyScalar(0.25).add(V(ODX, 0, 0));                          // корпус трохи йде за головою
     setCyl(oNeckMesh, oNeck.clone().add(opp.torso.position), TG.opp.center().addScaledVector(UP, -0.06));
   } });
 
@@ -1937,6 +2032,7 @@ $("steps").innerHTML = keys.filter(k => k.say).map(k => `<li data-t="${k.t}">${k
 $("time").max = END;
 function restart() { T = 0; headReset(); trails.R.pts = []; trails.L.pts = []; }
 $("play").onclick = () => { audioOn(); playing = !playing; $("play").textContent = playing ? "⏸ Пауза" : "▶ Пуск"; };
+addEventListener("keydown", e => { if (e.code === "Space" && !/INPUT|TEXTAREA|SELECT|BUTTON/.test(document.activeElement.tagName)) { e.preventDefault(); $("play").click(); } });   // пробіл = пауза / пуск
 $("restart").onclick = () => { audioOn(); restart(); playing = true; $("play").textContent = "⏸ Пауза"; };
 $("loop").onclick = () => { loop = !loop; $("loop").classList.toggle("on", loop); };
 $("spd").oninput = e => $("spdv").textContent = (+e.target.value).toFixed(2) + "×";
@@ -1954,6 +2050,7 @@ setCam(["hookkick", "ckp", "cpk", "ckc"].includes(LESSON) ? "kick" : "side");
 function currentTag(t) { let tag = ""; for (const k of keys) if (k.tag && k.t <= t + 0.03) tag = k.tag; return tag; }
 
 function pose(t, simDt) {
+  ODX = LESSON === "vid1" ? PD(t) : 0;
   const s = sample(t), b = body(s);
   updateTorso(b, s);
   hips.position.copy(b.P); hips.rotation.y = s.hip * RAD;
