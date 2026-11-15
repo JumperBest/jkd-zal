@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JKD Віртуальний зал: уроки</title>
-<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=d2755cfc) + кроки + типові помилки. Дивишся і тренуєшся.
+<title>Karate Cat · Віртуальний зал: уроки</title>
+<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=12b6b68a) + кроки + типові помилки. Дивишся і тренуєшся.
      Поки тільки удари руками (ноги в 3D ще неточні). Перевірка свого відео: в розробці.
      Урок вміщається на один екран; під 3D, своя панель: пуск/пауза, повзунок часу, швидкість. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -209,7 +209,7 @@
 <body>
 <header class="top">
   <button class="iconbtn" id="menuBtn" aria-label="Програма уроків">☰</button>
-  <a class="logo" href="index.html?v=06f9fb3b"><i></i>JKD <span>· Віртуальний зал</span></a>
+  <a class="logo" href="index.html?v=6a886d05"><i></i>Karate Cat <span>· Віртуальний зал</span></a>
   <span class="sp"></span>
   <div class="belt"><span>Шлях учня</span><div class="track"><i id="beltBar"></i></div><b id="beltTxt"></b></div>
   <div class="seg" role="group" aria-label="Правша чи лівша"><button data-hand="right">Правша</button><button data-hand="left">Лівша</button></div>
@@ -230,7 +230,7 @@
         <div class="blk" id="mistBlk"><h2>Типові помилки</h2><div id="mists"></div></div>
         <div class="vidsoon">
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg></span>
-          <span><b>Перевірка свого відео: в розробці.</b> Поки дивись тренера, повторюй поруч і став темп повзунком.</span>
+          <span><b>Перевірка свого відео: в розробці.</b> Поки дивись Рудого, повторюй поруч і став темп повзунком.</span>
         </div>
         <div class="finish" id="finish"></div>
       </div>
@@ -241,7 +241,7 @@
             <button data-tg="opp" class="on">Суперник</button><button data-tg="mitt">Лапа</button><button data-tg="bag">Груша</button>
           </div>
           <span class="sp"></span>
-          <button class="tbtn on" id="kiaiBtn" title="Крик тренера в момент удару">Кіай</button>
+          <button class="tbtn on" id="kiaiBtn" title="Крик Рудого в момент удару">Кіай</button>
           <button class="tbtn" id="loopBtn" title="Повторювати по колу">⟲ Коло</button>
         </div>
         <div class="tools tools2">
@@ -1035,7 +1035,7 @@ function showHome() {
   $("lesson").hidden = true; $("home").hidden = false;
   const next = OPEN.find(id => !state.passed.has(id));
   let html = `<div class="welcome anim"><div class="eyebrow">Вітаю в залі</div><h1>Будь як <em>вода</em></h1>
-    <p>Дивись 3D-тренера, став паузу, крути повзунок і повторюй поруч. Почни зі стійки: далі кроки, удари руками, траппінг і серії. Швидкість ×1 реальна, ×0.1 найповільніша.</p>
+    <p>Дивись Рудого, став паузу, крути повзунок і повторюй поруч. Почни зі стійки: далі кроки, удари руками, траппінг і серії. Швидкість ×1 реальна, ×0.1 найповільніша.</p>
     <div>${next ? `<button class="btn pri" data-go="${next}">${state.passed.size ? "Продовжити" : "Почати"}: ${LESSONS[next].title} <span class="arr">→</span></button>`
                 : `<span class="chip">Усі відкриті уроки пройдено ✓</span>`}</div></div>`;
   PROGRAM.forEach((g, gi) => {
@@ -1154,7 +1154,7 @@ const player = (() => {
       model = L.model;
       const v = $("view"); v.querySelectorAll("iframe").forEach(f => f.remove());
       iframe = document.createElement("iframe"); iframe.title = "3D-тренер";
-      iframe.src = `trainer3d.html?v=d2755cfc&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
+      iframe.src = `trainer3d.html?v=12b6b68a&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
       iframe.onload = () => { apply(); camera(); setT(pending != null ? pending : L.from); if (pending == null && !L.still) play(true); pending = null; };
       v.prepend(iframe);
     } else { setT(L.from); if (!L.still) play(true); }
