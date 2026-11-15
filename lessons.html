@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Karate Cat · Віртуальний зал: уроки</title>
-<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=12b6b68a) + кроки + типові помилки. Дивишся і тренуєшся.
+<!-- Макет-прототип: урок = 3D-тренер (trainer3d.html?v=f5e56493) + кроки + типові помилки. Дивишся і тренуєшся.
      Поки тільки удари руками (ноги в 3D ще неточні). Перевірка свого відео: в розробці.
      Урок вміщається на один екран; під 3D, своя панель: пуск/пауза, повзунок часу, швидкість. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -209,10 +209,12 @@
 <body>
 <header class="top">
   <button class="iconbtn" id="menuBtn" aria-label="Програма уроків">☰</button>
-  <a class="logo" href="index.html?v=6a886d05"><i></i>Karate Cat <span>· Віртуальний зал</span></a>
+  <a class="logo" href="index.html?v=b72180e0"><i></i>Karate Cat <span>· Віртуальний зал</span></a>
   <span class="sp"></span>
   <div class="belt"><span>Шлях учня</span><div class="track"><i id="beltBar"></i></div><b id="beltTxt"></b></div>
   <div class="seg" role="group" aria-label="Правша чи лівша"><button data-hand="right">Правша</button><button data-hand="left">Лівша</button></div>
+  <div class="seg" role="group" aria-label="Тренер"><button data-pskin="cat">Кіт</button><button data-pskin="human">Людина</button></div>
+  <div class="seg" role="group" aria-label="Суперник"><button data-popp="wolf">Вовк</button><button data-popp="human">Людина</button></div>
 </header>
 
 <div class="app">
@@ -1154,7 +1156,7 @@ const player = (() => {
       model = L.model;
       const v = $("view"); v.querySelectorAll("iframe").forEach(f => f.remove());
       iframe = document.createElement("iframe"); iframe.title = "3D-тренер";
-      iframe.src = `trainer3d.html?v=12b6b68a&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
+      iframe.src = `trainer3d.html?v=f5e56493&lesson=${L.model}&embed=1&hero=1&zone=${ui.zone}${ui.left ? "&hand=left" : ""}`;
       iframe.onload = () => { apply(); camera(); setT(pending != null ? pending : L.from); if (pending == null && !L.still) play(true); pending = null; };
       v.prepend(iframe);
     } else { setT(L.from); if (!L.still) play(true); }
@@ -1218,6 +1220,20 @@ showHand();
 // ===================== СТАРТ =====================
 const want = new URLSearchParams(location.search).get("lesson");
 if (want && LESSONS[want]) startLesson(want); else showHome();
+</script>
+<script>
+// вибір тренера (кіт / людина) і суперника (вовк / людина): пишемо в localStorage, 3D-вікно перезавантажується й читає вибір
+(function () {
+  const get = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+  const show = () => { const s = get("jkdSkin", "cat"), o = get("jkdOpp", "wolf") === "human" ? "human" : "wolf";
+    document.querySelectorAll("[data-pskin]").forEach(b => b.classList.toggle("on", b.dataset.pskin === s));
+    document.querySelectorAll("[data-popp]").forEach(b => b.classList.toggle("on", b.dataset.popp === o)); };
+  const pick = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} show();
+    document.querySelectorAll("iframe").forEach(f => { try { f.contentWindow.location.reload(); } catch (e) {} }); };
+  document.querySelectorAll("[data-pskin]").forEach(b => b.onclick = () => pick("jkdSkin", b.dataset.pskin));
+  document.querySelectorAll("[data-popp]").forEach(b => b.onclick = () => pick("jkdOpp", b.dataset.popp));
+  show();
+})();
 </script>
 </body>
 </html>

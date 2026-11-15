@@ -52,6 +52,10 @@
     <div class="row">
       <button data-skin="cat">Кіт Рудий</button><button data-skin="human">Людина</button>
     </div>
+    <h2>Суперник</h2>
+    <div class="row">
+      <button data-opp="wolf">Вовк Джонні</button><button data-opp="human">Людина</button>
+    </div>
     <h2>Зона</h2>
     <div class="row">
       <button data-zone="gym" class="on">Зал</button><button data-zone="alley">Провулок</button><button data-zone="dojo">Додзьо</button>
@@ -107,6 +111,8 @@ const SERIES = ["c12", "c123", "ckp", "cpk", "ckc", "vid1"];                 // 
 const QS = new URLSearchParams(location.search);
 const SKIN = (() => { let s = QS.get("skin"); try { if (s === "cat" || s === "human") localStorage.setItem("jkdSkin", s); else s = localStorage.getItem("jkdSkin"); } catch (e) {} return s === "human" ? "human" : "cat"; })();   // за замовчуванням кіт; вибір запам'ятовується
 const CAT_ON = SKIN === "cat";
+addEventListener("DOMContentLoaded", () => document.querySelectorAll("[data-opp]").forEach(b => { b.classList.toggle("on", b.dataset.opp === (OPPSK === "human" ? "human" : "wolf"));
+  b.onclick = () => { const u = new URL(location.href); u.searchParams.set("opp", b.dataset.opp); location.href = u; }; }));
 addEventListener("DOMContentLoaded", () => document.querySelectorAll("[data-skin]").forEach(b => { b.classList.toggle("on", b.dataset.skin === SKIN);
   b.onclick = () => { const u = new URL(location.href); u.searchParams.set("skin", b.dataset.skin); location.href = u; }; }));   // ПРОБА: оболонка кота Рудого замість людини (скелет і пози ті самі)
 const CATX = { on: CAT_ON };
@@ -1642,8 +1648,9 @@ function glowFist(g, on) { g.userData.glow.forEach(o => o.material.emissive.setH
 // ---------- суперник ----------
 // стоїть обличчям до бійця (дивиться в −x), у невисокій стійці; руки опущені, щоб удари проходили.
 const OM = { body: mat(0x5b6270), legs: mat(0x454c5c), shoe: mat(0x23272e), skin: mat(0xc99c7c), dark: new THREE.MeshStandardMaterial({ color: 0x2b2f36 }) };
-const OPP_W2 = QS.get("opp") === "wolf2";   // варіант B: ще масивніший, з напульсниками, окантовкою й пухнастим хвостом
-const OPP_WOLF = QS.get("opp") === "wolf" || OPP_W2;   // ПРОБА: суперник — вовк Джонні Гавренс (Акт 2); габарити, руки й фізика ті самі
+const OPPSK = (() => { let s = QS.get("opp"); try { if (["wolf", "wolf2", "human"].includes(s)) localStorage.setItem("jkdOpp", s); else s = localStorage.getItem("jkdOpp"); } catch (e) {} return ["wolf", "wolf2", "human"].includes(s) ? s : "wolf"; })();   // суперник за замовчуванням вовк
+const OPP_W2 = OPPSK === "wolf2";   // варіант B: ще масивніший, з напульсниками, окантовкою й пухнастим хвостом
+const OPP_WOLF = OPPSK === "wolf" || OPP_W2;   // ПРОБА: суперник — вовк Джонні Гавренс (Акт 2); габарити, руки й фізика ті самі
 OM.fur = OM.skin;
 if (OPP_WOLF) { OM.body.color.setHex(0x1d1717); OM.legs.color.setHex(0x1d1717); OM.skin.color.setHex(0x8b6b55); OM.fur = OM.skin; OM.dark.color.setHex(0xa98760); OM.shoe.color.setHex(0xcdb08a); }
 const OPP_SH = [V(0.66, 1.33, 0.14), V(0.66, 1.33, -0.24)];   // плечі суперника
